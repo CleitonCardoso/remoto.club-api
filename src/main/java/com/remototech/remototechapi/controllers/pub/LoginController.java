@@ -9,16 +9,19 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.config.JwtTokenUtil;
 import com.remototech.remototechapi.config.dto.JwtRequestDto;
 import com.remototech.remototechapi.config.dto.JwtResponseDto;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.services.LoginService;
 
 @RestController
@@ -34,6 +37,9 @@ public class LoginController {
 
 	@Autowired
 	private LoginService loginService;
+
+	@Autowired
+	private PasswordEncoder passwordEncoder;
 
 	@Transactional
 	@PostMapping
@@ -57,7 +63,12 @@ public class LoginController {
 	}
 
 	@PostMapping("create")
-	public void create(@RequestBody Login login) {
+	public void create(@RequestBody Login login) throws GlobalException {
 		loginService.create( login );
+	}
+
+	@PostMapping("recovery")
+	public void recoveryPassword(@RequestParam("email") String email) throws GlobalException {
+		loginService.recoveryPassword( email );
 	}
 }

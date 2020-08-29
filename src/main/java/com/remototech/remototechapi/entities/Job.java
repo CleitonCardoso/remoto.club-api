@@ -4,7 +4,6 @@ import java.math.BigDecimal;
 import java.util.Set;
 import java.util.UUID;
 
-import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -39,12 +38,13 @@ public class Job {
 
 	private String experienceRequired;
 
+	@Column(length = 1024)
 	private String description;
 
 	private BigDecimal salary;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid")
+	@OneToOne
+	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid", updatable = false)
 	private Tenant tenant;
 
 	@ManyToMany(mappedBy = "jobs")

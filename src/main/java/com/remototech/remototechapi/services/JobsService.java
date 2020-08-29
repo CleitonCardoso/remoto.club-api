@@ -109,4 +109,9 @@ public class JobsService {
 		return repository.findAll( query, PageRequest.of( pageIndex, resultSize ) );
 	}
 
+	public Job create(Job job, Tenant tenant) {
+		job.setTenant( tenant );
+		return repository.save( job );
+	}
+
 }

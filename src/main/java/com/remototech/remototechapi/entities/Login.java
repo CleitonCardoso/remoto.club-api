@@ -18,6 +18,8 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -37,26 +39,31 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@Table(uniqueConstraints = { @UniqueConstraint(columnNames = "username"), @UniqueConstraint(columnNames = "email") })
 public class Login implements UserDetails {
+
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@Column(columnDefinition = "uuid", updatable = false)
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
 	private UUID uuid;
 
+	@Column(nullable = false)
 	private String username;
+	@Column(nullable = false)
 	private String email;
 
 	@JsonProperty(access = Access.WRITE_ONLY)
 	@Column(nullable = false, length = 512)
 	private String password;
 
-	@OneToOne(mappedBy = "login", fetch = FetchType.EAGER)
+	@OneToOne(mappedBy = "login", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude
 	private AppUser user;
 
-	@OneToOne(cascade = CascadeType.ALL)
+	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid")
 	private Tenant tenant;
 
