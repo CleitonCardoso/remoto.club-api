@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.services;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -111,7 +112,12 @@ public class JobsService {
 
 	public Job create(Job job, Tenant tenant) {
 		job.setTenant( tenant );
+		job.setCompany( tenant.getCompanyName() );
 		return repository.save( job );
+	}
+
+	public Job findByIdAndTenant(UUID uuid, Tenant tenant) {
+		return repository.findByUuidAndTenant( uuid, tenant );
 	}
 
 }

@@ -1,10 +1,12 @@
 package com.remototech.remototechapi.controllers.priv;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -31,6 +33,12 @@ public class MyJobsController extends LoggedInController {
 			JobsFilter filter) throws IOException {
 		Login loggedUser = getLoggedUser();
 		return jobsService.findAllByFilterAndTenant( filter, pageIndex - 1, resultSize, loggedUser.getTenant() );
+	}
+
+	@GetMapping("{uuid}")
+	public Job findById(@PathVariable("uuid") UUID uuid) {
+		Login loggedUser = getLoggedUser();
+		return jobsService.findByIdAndTenant( uuid, loggedUser.getTenant() );
 	}
 
 	@PostMapping
