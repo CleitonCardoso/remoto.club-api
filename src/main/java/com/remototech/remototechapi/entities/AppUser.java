@@ -13,6 +13,9 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,6 +27,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@DynamicUpdate
 public class AppUser {
 
 	@Id
@@ -31,14 +35,15 @@ public class AppUser {
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
 	private UUID uuid;
 
+	@NotBlank(message = "Nome é obrigatório.")
 	private String name;
 
 	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "login_uuid", referencedColumnName = "uuid")
+	@JoinColumn(name = "login_uuid", referencedColumnName = "uuid", updatable = false, nullable = false)
 	private Login login;
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid")
+	@OneToOne
+	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid", updatable = false, nullable = false)
 	private Tenant tenant;
 
 	@Column(updatable = false)

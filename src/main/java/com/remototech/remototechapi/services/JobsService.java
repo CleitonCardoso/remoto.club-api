@@ -13,6 +13,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Tenant;
@@ -118,6 +119,11 @@ public class JobsService {
 
 	public Job findByIdAndTenant(UUID uuid, Tenant tenant) {
 		return repository.findByUuidAndTenant( uuid, tenant );
+	}
+
+	@Transactional
+	public void removeByUuidAndTenant(UUID uuid, Tenant tenant) {
+		repository.removeByUuidAndTenant( uuid, tenant );
 	}
 
 }

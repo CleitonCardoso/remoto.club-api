@@ -19,4 +19,11 @@ public class TenantService {
 		return tenantRepository.save( tenant );
 	}
 
+	public Tenant update(Tenant tenant, Tenant currentTenant) {
+		System.out.println( currentTenant );
+		System.out.println( tenant );
+		tenant.setUuid( currentTenant.getUuid() );
+		return tenantRepository.save( tenant );
+	}
+
 }

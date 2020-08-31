@@ -20,6 +20,8 @@ import javax.persistence.PreUpdate;
 import javax.persistence.Transient;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
+import javax.validation.constraints.NotBlank;
+import org.hibernate.annotations.DynamicUpdate;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -40,6 +42,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(uniqueConstraints = { @UniqueConstraint(columnNames = "username"), @UniqueConstraint(columnNames = "email") })
+@DynamicUpdate
 public class Login implements UserDetails {
 
 	private static final long serialVersionUID = 1L;
@@ -50,8 +53,11 @@ public class Login implements UserDetails {
 	private UUID uuid;
 
 	@Column(nullable = false)
+	@NotBlank(message = "Nome de usuário é obrigatório.")
 	private String username;
+
 	@Column(nullable = false)
+	@NotBlank(message = "Email é obrigatório.")
 	private String email;
 
 	@JsonProperty(access = Access.WRITE_ONLY)

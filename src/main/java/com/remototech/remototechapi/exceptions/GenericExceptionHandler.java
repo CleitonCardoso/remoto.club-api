@@ -1,10 +1,16 @@
 package com.remototech.remototechapi.exceptions;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.validation.ConstraintViolationException;
+
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -46,6 +52,24 @@ public class GenericExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ErrorMessage( DEFAULT_MESSAGE );
 	}
 
+	@ExceptionHandler(value = ConstraintViolationException.class)
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ResponseBody
+	protected ErrorMessage handleConflictGeneric(ConstraintViolationException ex) {
+		List<String> errors = new ArrayList<>();
+		ex.getConstraintViolations().forEach( (error) -> {
+			errors.add( error.getMessage() );
+		} );
+
+		StringBuilder sb = new StringBuilder();
+
+		for (String error : errors) {
+			sb.append( "- " + error + "\r\n" );
+		}
+
+		return new ErrorMessage( sb.toString() );
+	}
+
 	@ExceptionHandler(value = GlobalException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	@ResponseBody
@@ -60,4 +84,20 @@ public class GenericExceptionHandler extends ResponseEntityExceptionHandler {
 		return new ResponseEntity<Object>( new ErrorMessage( ex.getMessage() ), HttpStatus.BAD_REQUEST );
 	}
 
+	@Override
+	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers, HttpStatus status, WebRequest request) {
+		List<String> errors = new ArrayList<>();
+		ex.getBindingResult().getAllErrors().forEach( (error) -> {
+			String errorMessage = error.getDefaultMessage();
+			errors.add( errorMessage );
+		} );
+
+		StringBuilder sb = new StringBuilder();
+
+		for (String error : errors) {
+			sb.append( "- " + error + "\r\n" );
+		}
+
+		return new ResponseEntity<Object>( new ErrorMessage( sb.toString() ), HttpStatus.BAD_REQUEST );
+	}
 }

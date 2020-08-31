@@ -3,8 +3,11 @@ package com.remototech.remototechapi.controllers.priv;
 import java.io.IOException;
 import java.util.UUID;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,9 +45,14 @@ public class MyJobsController extends LoggedInController {
 	}
 
 	@PostMapping
-	public Job create(@RequestBody Job job) {
+	public Job create(@Valid @RequestBody Job job) {
 		Login loggedUser = getLoggedUser();
 		return jobsService.create( job, loggedUser.getTenant() );
+	}
+
+	@DeleteMapping("{uuid}")
+	public void remove(@PathVariable("uuid") UUID uuid) {
+		jobsService.removeByUuidAndTenant( uuid, getLoggedUser().getTenant() );
 	}
 
 }

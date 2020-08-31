@@ -29,6 +29,9 @@ public class LoginService implements UserDetailsService {
 	private TenantService tenantService;
 
 	@Autowired
+	private AppUserService appUserService;
+
+	@Autowired
 	private PasswordEncoder passwordEncoder;
 
 	public List<Login> findAll() {
@@ -70,10 +73,12 @@ public class LoginService implements UserDetailsService {
 		validateLogin( login );
 		login.setRole( Role.COMPANY );
 		login.setPassword( passwordEncoder.encode( login.getPassword() ) );
-		login.setUser( AppUser.builder().name( login.getUsername() ).build() );
 		Tenant tenant = tenantService.create( login.getTenant() );
 		login.setTenant( tenant );
-		loginRepository.save( login );
+		Login loginSaved = loginRepository.save( login );
+
+		AppUser appUser = AppUser.builder().name( login.getUsername() ).login( loginSaved ).tenant( tenant ).build();
+		appUserService.save( appUser );
 	}
 
 	private void validateLogin(Login login) throws GlobalException {

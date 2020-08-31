@@ -7,6 +7,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.ColumnDefault;
 
@@ -27,6 +28,7 @@ public class Tenant {
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
 	private UUID uuid;
 
+	@NotBlank(message = "Nome da empresa obrigatório.")
 	private String companyName;
 	private String phone;
 	private String contactEmail;
