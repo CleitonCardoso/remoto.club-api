@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.entities;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.UUID;
 
@@ -12,6 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -56,5 +59,20 @@ public class Job {
 
 	@ManyToMany(mappedBy = "jobs")
 	private Set<Candidate> candidates;
+
+	@Column(updatable = false)
+	private LocalDateTime createdDate;
+
+	private LocalDateTime lastUpdate;
+
+	@PrePersist
+	public void prePersist() {
+		createdDate = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		lastUpdate = LocalDateTime.now();
+	}
 
 }

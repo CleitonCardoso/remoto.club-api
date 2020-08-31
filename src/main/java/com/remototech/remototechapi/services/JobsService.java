@@ -11,6 +11,7 @@ import javax.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -108,7 +109,7 @@ public class JobsService {
 			query = query == null ? tenantSpec : query.and( tenantSpec );
 		}
 
-		return repository.findAll( query, PageRequest.of( pageIndex, resultSize ) );
+		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "createdDate" ).descending() ) );
 	}
 
 	public Job create(Job job, Tenant tenant) {
