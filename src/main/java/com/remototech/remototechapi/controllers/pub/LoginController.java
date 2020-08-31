@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.controllers.pub;
 
 import javax.transaction.Transactional;
+import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -9,7 +10,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -38,9 +38,6 @@ public class LoginController {
 	@Autowired
 	private LoginService loginService;
 
-	@Autowired
-	private PasswordEncoder passwordEncoder;
-
 	@Transactional
 	@PostMapping
 	public ResponseEntity<?> auth(@RequestBody JwtRequestDto auth) {
@@ -63,7 +60,7 @@ public class LoginController {
 	}
 
 	@PostMapping("create")
-	public void create(@RequestBody Login login) throws GlobalException {
+	public void create(@Valid @RequestBody Login login) throws GlobalException {
 		loginService.create( login );
 	}
 
