@@ -18,6 +18,8 @@ import javax.persistence.PreUpdate;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -46,7 +48,7 @@ public class Job {
 	@NotBlank(message = "Experiência desejada é obrigatório.")
 	private String experienceRequired;
 
-	@Column(length = 1024)
+	@Column(length = 2048)
 	@NotBlank(message = "Descrição é obrigatório.")
 	private String description;
 
@@ -55,6 +57,7 @@ public class Job {
 
 	@OneToOne
 	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid", updatable = false)
+	@JsonIgnore
 	private Tenant tenant;
 
 	@ManyToMany(mappedBy = "jobs")
