@@ -23,6 +23,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 @Data
@@ -61,6 +62,8 @@ public class Job {
 	private Tenant tenant;
 
 	@ManyToMany(mappedBy = "jobs")
+	@JsonIgnore
+	@EqualsAndHashCode.Exclude
 	private Set<Candidate> candidates;
 
 	@Column(updatable = false)

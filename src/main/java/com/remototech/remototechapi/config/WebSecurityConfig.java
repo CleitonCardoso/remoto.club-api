@@ -85,7 +85,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 							"/webjars/**",
 							"/login",
 							"/login/*",
-							"/public/*" )
+							"/public/**" )
 					.permitAll()
 					.antMatchers( HttpMethod.OPTIONS, "/**" )
 					.permitAll().

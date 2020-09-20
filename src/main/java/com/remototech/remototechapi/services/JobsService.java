@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.services;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -16,6 +17,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Tenant;
 import com.remototech.remototechapi.repositories.JobsRepository;
@@ -26,6 +28,9 @@ public class JobsService {
 
 	@Autowired
 	private JobsRepository repository;
+
+	@Autowired
+	private CandidateService candidateService;
 
 	public Page<Job> findAllByFilter(JobsFilter filter, Integer pageIndex, Integer resultSize) {
 		return findAllByFilterAndTenant( filter, pageIndex, resultSize, null );
@@ -125,6 +130,21 @@ public class JobsService {
 	@Transactional
 	public void removeByUuidAndTenant(UUID uuid, Tenant tenant) {
 		repository.removeByUuidAndTenant( uuid, tenant );
+	}
+
+	public void apply(UUID jobUuid, String linkedInUrl) {
+		Candidate candidate = candidateService.getOrCreateIfNotExists( linkedInUrl );
+
+		Optional<Job> jobOptional = repository.findById( jobUuid );
+
+		if (jobOptional.isPresent()) {
+			Job job = jobOptional.get();
+			job.getCandidates().add( candidate );
+			candidate.getJobs().add( job );
+			candidateService.update( candidate );
+			repository.save( job );
+		}
+
 	}
 
 }
