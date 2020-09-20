@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.controllers.priv;
 
 import java.io.IOException;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.validation.Valid;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.controllers.LoggedInController;
+import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.services.JobsService;
@@ -53,6 +55,12 @@ public class MyJobsController extends LoggedInController {
 	@DeleteMapping("{uuid}")
 	public void remove(@PathVariable("uuid") UUID uuid) {
 		jobsService.removeByUuidAndTenant( uuid, getLoggedUser().getTenant() );
+	}
+
+	@GetMapping("{uuid}/candidates")
+	public Set<Candidate> getCandidates(@PathVariable("uuid") UUID jobUuid) {
+		Login loggedUser = getLoggedUser();
+		return jobsService.getCandidatesFrom( jobUuid, loggedUser.getTenant() );
 	}
 
 }

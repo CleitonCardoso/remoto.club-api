@@ -2,6 +2,7 @@ package com.remototech.remototechapi.services;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -145,6 +146,14 @@ public class JobsService {
 			repository.save( job );
 		}
 
+	}
+
+	public Set<Candidate> getCandidatesFrom(UUID jobUuid, Tenant tenant) {
+		Job job = repository.findByUuidAndTenant( jobUuid, tenant );
+		if (job != null) {
+			return job.getCandidates();
+		}
+		return null;
 	}
 
 }
