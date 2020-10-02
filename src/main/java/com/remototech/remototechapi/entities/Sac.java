@@ -24,7 +24,7 @@ public class Sac {
 	@Id
 	@Column(columnDefinition = "uuid", updatable = false)
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
-	private UUID uuid;;
+	private UUID uuid;
 
 	@NotBlank(message = "Título não pode estar vazio.")
 	private String title;
