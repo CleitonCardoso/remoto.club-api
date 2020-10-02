@@ -10,18 +10,18 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.entities.Sac;
 import com.remototech.remototechapi.repositories.SacRepository;
+import com.remototech.remototechapi.services.SacService;
 
 @RestController
 @RequestMapping("private/sac")
 public class SacController {
 	
 	@Autowired
-	private SacRepository repository;
+	private SacService service;
 	
 	@PostMapping
-	public Sac createSac(@Valid @RequestBody Sac sac) {
-		System.out.println(sac);
-		return repository.save(sac);
+	public Sac update(@Valid @RequestBody Sac sac) {
+		return service.save(sac);
 	}
 
 }
