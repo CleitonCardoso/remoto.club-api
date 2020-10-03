@@ -64,6 +64,10 @@ public class Login implements UserDetails {
 	@Column(nullable = false, length = 512)
 	private String password;
 
+	@JsonProperty(access = Access.WRITE_ONLY)
+	@Column(nullable = true, length = 512)
+	private String linkedInId;
+
 	@OneToOne(mappedBy = "login", fetch = FetchType.EAGER, cascade = CascadeType.PERSIST)
 	@JsonIgnore
 	@EqualsAndHashCode.Exclude

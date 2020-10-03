@@ -34,6 +34,9 @@ public class LoginService implements UserDetailsService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 
+	@Autowired
+	private LinkedInService linkedInService;
+
 	public List<Login> findAll() {
 		log.info( "{} Listando todos os Logins" );
 		return this.loginRepository.findAll();
@@ -103,6 +106,34 @@ public class LoginService implements UserDetailsService {
 			throw new GlobalException( "Email não cadastrado no sistema." );
 		}
 
+	}
+
+	public Login findByLinkedInId(String linkedInId) {
+		return loginRepository.findByLinkedInId( linkedInId );
+	}
+
+	public void createSocial(Login login, String linkedInCode, String redirectUri) throws GlobalException {
+		validateLogin( login );
+
+		String linkedInId = linkedInService.getLinkedInId( linkedInCode, redirectUri );
+
+		validateLinkedinId( linkedInId );
+
+		login.setLinkedInId( linkedInId );
+		login.setRole( Role.COMPANY );
+		Tenant tenant = tenantService.create( login.getTenant() );
+		login.setTenant( tenant );
+
+		Login loginSaved = loginRepository.save( login );
+
+		AppUser appUser = AppUser.builder().name( login.getUsername() ).login( loginSaved ).tenant( tenant ).build();
+		appUserService.save( appUser );
+	}
+
+	private void validateLinkedinId(String linkedInId) throws GlobalException {
+		if (loginRepository.existsByLinkedInId( linkedInId )) {
+			throw new GlobalException( "Usuário já cadastrado com o LinkedIn" );
+		}
 	}
 
 }
