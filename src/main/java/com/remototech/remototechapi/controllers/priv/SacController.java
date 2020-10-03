@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.controllers.LoggedInController;
+import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.Sac;
 import com.remototech.remototechapi.services.SacService;
 
@@ -21,7 +22,7 @@ public class SacController extends LoggedInController {
 	
 	@PostMapping
 	public Sac update(@Valid @RequestBody Sac sac) {
-		return service.save( sac );
+		return service.save( sac, getLoggedUser() );
 	}
 
 }
