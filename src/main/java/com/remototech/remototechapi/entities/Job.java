@@ -56,6 +56,8 @@ public class Job {
 	@NotNull(message = "Salário é obrigatório.")
 	private BigDecimal salary;
 
+	private CompensationType compensationType;
+
 	@OneToOne
 	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid", updatable = false)
 	@JsonIgnore
