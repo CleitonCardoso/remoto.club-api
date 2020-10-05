@@ -16,4 +16,8 @@ public interface LoginRepository extends JpaRepository<Login, Integer> {
 
 	public Login findByEmail(String email);
 
+	public Login findByLinkedInId(String linkedInCode);
+
+	public boolean existsByLinkedInId(String linkedInId);
+
 }

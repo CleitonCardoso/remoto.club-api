@@ -1,10 +1,16 @@
 package com.remototech.remototechapi.config.dto;
 
-import lombok.Data;
-
 import java.io.Serializable;
 
-@Data
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class JwtRequestDto implements Serializable {
 
 	private static final long serialVersionUID = 5271437043597069374L;
@@ -13,12 +19,8 @@ public class JwtRequestDto implements Serializable {
 
 	private String password;
 
-	public JwtRequestDto() {
-	}
+	private String linkedInCode;
 
-	public JwtRequestDto(String username, String password) {
+	private String redirectUri;
 
-		this.setUsername( username );
-		this.setPassword( password );
-	}
 }
