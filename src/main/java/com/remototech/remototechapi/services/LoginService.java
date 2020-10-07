@@ -74,13 +74,22 @@ public class LoginService implements UserDetailsService {
 
 	public void create(Login login) throws GlobalException {
 		validateLogin( login );
-		login.setRole( Role.COMPANY );
 		login.setPassword( passwordEncoder.encode( login.getPassword() ) );
-		Tenant tenant = tenantService.create( login.getTenant() );
-		login.setTenant( tenant );
+		if (login.getRole() == Role.COMPANY) {
+			Tenant tenant = tenantService.create( login.getTenant() );
+			login.setTenant( tenant );
+		}
 		Login loginSaved = loginRepository.save( login );
 
-		AppUser appUser = AppUser.builder().name( login.getUsername() ).login( loginSaved ).tenant( tenant ).build();
+		AppUser appUser = AppUser.builder()
+				.name( login.getUsername() )
+				.login( loginSaved )
+				.build();
+
+		if (login.getTenant() != null) {
+			appUser.setTenant( login.getTenant() );
+		}
+
 		appUserService.save( appUser );
 	}
 
