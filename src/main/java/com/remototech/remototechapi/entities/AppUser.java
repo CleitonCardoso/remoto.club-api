@@ -43,7 +43,7 @@ public class AppUser {
 	private Login login;
 
 	@OneToOne
-	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid", updatable = false, nullable = false)
+	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid", updatable = false, nullable = true)
 	private Tenant tenant;
 
 	@Column(updatable = false)
