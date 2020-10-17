@@ -1,4 +1,4 @@
-package com.remototech.remototechapi.controllers.pub;
+package com.remototech.remototechapi.controllers.priv;
 
 import java.io.IOException;
 
@@ -9,13 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.Job;
+import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.services.JobsService;
 import com.remototech.remototechapi.vos.JobsFilter;
 
 @RestController
-@RequestMapping("public/jobs")
-public class JobsController {
+@RequestMapping("private/my-applications")
+public class MyApplicationsController extends LoggedInController {
 
 	@Autowired
 	private JobsService jobsService;
@@ -25,7 +27,8 @@ public class JobsController {
 			final @RequestParam(value = "page-index", defaultValue = "0", required = false) Integer pageIndex,
 			final @RequestParam(value = "result-size", defaultValue = "10", required = false) Integer resultSize,
 			JobsFilter filter) throws IOException {
-		return jobsService.findAllByFilter( filter, pageIndex < 1 ? 0 : pageIndex - 1, resultSize );
+		Login loggedUser = getLoggedUser();
+		return jobsService.findAllByFilterAndCandidate( filter, pageIndex - 1, resultSize, loggedUser );
 	}
 
 }

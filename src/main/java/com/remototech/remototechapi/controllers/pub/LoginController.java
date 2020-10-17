@@ -22,8 +22,8 @@ import com.remototech.remototechapi.config.dto.JwtRequestDto;
 import com.remototech.remototechapi.config.dto.JwtResponseDto;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.exceptions.GlobalException;
-import com.remototech.remototechapi.services.LoginService;
 import com.remototech.remototechapi.services.LinkedInService;
+import com.remototech.remototechapi.services.LoginService;
 
 @RestController
 @RequestMapping("/login")
@@ -46,7 +46,7 @@ public class LoginController {
 	@PostMapping
 	public ResponseEntity<?> auth(@RequestBody JwtRequestDto auth) throws GlobalException {
 		Login login = loginService.findByUsername( auth.getUsername() );
-		if (login == null) {
+		if (login == null && auth.getLinkedInCode() != null) {
 			String linkedInId = linkedInService.getLinkedInId( auth.getLinkedInCode(), auth.getRedirectUri() );
 			login = loginService.findByLinkedInId( linkedInId );
 

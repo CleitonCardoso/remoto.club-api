@@ -12,6 +12,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToOne;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -35,6 +36,10 @@ public class Candidate {
 
 	private String nome;
 	private String linkedInUrl;
+
+	@OneToOne
+	@JsonIgnore
+	private Login login;
 
 	@ManyToMany
 	@JoinTable(name = "jobs_candidates", joinColumns = @JoinColumn(name = "candidate_uuid"), inverseJoinColumns = @JoinColumn(name = "job_uuid"))

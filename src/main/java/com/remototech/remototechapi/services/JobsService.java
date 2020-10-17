@@ -1,12 +1,15 @@
 package com.remototech.remototechapi.services;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -20,7 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Job;
+import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.Tenant;
+import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.JobsRepository;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -133,12 +138,18 @@ public class JobsService {
 		repository.removeByUuidAndTenant( uuid, tenant );
 	}
 
-	public void apply(UUID jobUuid, String linkedInUrl) {
-		Candidate candidate = candidateService.getOrCreateIfNotExists( linkedInUrl );
+	public void apply(UUID jobUuid, Login login) throws GlobalException {
+		Candidate candidate = candidateService.getOrCreateIfNotExists( login );
 
 		Optional<Job> jobOptional = repository.findById( jobUuid );
 
 		if (jobOptional.isPresent()) {
+			boolean alreadyApplied = repository.existsByUuidAndCandidatesIn( jobUuid, Arrays.asList( candidate ) );
+
+			if (alreadyApplied) {
+				throw new GlobalException( "Você já se aplicou para esta vaga" );
+			}
+
 			Job job = jobOptional.get();
 			job.getCandidates().add( candidate );
 			candidate.getJobs().add( job );
@@ -154,6 +165,90 @@ public class JobsService {
 			return job.getCandidates();
 		}
 		return null;
+	}
+
+	public Page<Job> findAllByFilterAndCandidate(JobsFilter filter, int pageIndex, Integer resultSize, Login loggedUser) {
+		List<String> contractTypes = filter.getContractTypes();
+		List<String> keyWords = filter.getKeyWords();
+		List<String> experienceTypes = filter.getExperienceTypes();
+
+		Specification<Job> contractTypesSpec = new Specification<Job>() {
+			private static final long serialVersionUID = -6943225890349201334L;
+
+			@Override
+			public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				return root.get( "contractType" ).in( contractTypes );
+			}
+
+		};
+
+		Specification<Job> keyWordsSpec = new Specification<Job>() {
+			private static final long serialVersionUID = 9164462953718514652L;
+
+			@Override
+			public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				Predicate predicate = null;
+				for (String keyWord : keyWords) {
+					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "title" ) ), "%" + keyWord.toUpperCase() + "%" );
+					predicate = predicate == null ? insidePredicate : criteriaBuilder.or( predicate, insidePredicate );
+				}
+
+				for (String keyWord : keyWords) {
+					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "description" ) ), "%" + keyWord.toUpperCase() + "%" );
+					predicate = predicate == null ? insidePredicate : criteriaBuilder.or( predicate, insidePredicate );
+				}
+
+				for (String keyWord : keyWords) {
+					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "company" ) ), "%" + keyWord.toUpperCase() + "%" );
+					predicate = predicate == null ? insidePredicate : criteriaBuilder.or( predicate, insidePredicate );
+				}
+				return predicate;
+			}
+
+		};
+
+		Specification<Job> experienceTypesSpec = new Specification<Job>() {
+			private static final long serialVersionUID = 9164462953718514652L;
+
+			@Override
+			public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				return root.get( "experienceRequired" ).in( experienceTypes );
+			}
+
+		};
+
+		Specification<Job> query = null;
+
+		if (contractTypes != null && !contractTypes.isEmpty()) {
+			query = contractTypesSpec;
+		}
+
+		if (keyWords != null && !keyWords.isEmpty()) {
+			query = query == null ? keyWordsSpec : query.and( keyWordsSpec );
+		}
+
+		if (experienceTypes != null && !experienceTypes.isEmpty()) {
+			query = query == null ? experienceTypesSpec : query.and( experienceTypesSpec );
+		}
+
+		Candidate candidate = candidateService.getOrCreateIfNotExists( loggedUser );
+
+		Specification<Job> candidatesSpec = new Specification<Job>() {
+			private static final long serialVersionUID = -6945498614404875034L;
+
+			@Override
+			public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				return root.get( "uuid" ).in( candidate.getJobs()
+						.stream()
+						.map( candidate -> candidate.getUuid() )
+						.collect( Collectors.toList() ) );
+			}
+
+		};
+
+		query = query == null ? candidatesSpec : query.and( candidatesSpec );
+
+		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "createdDate" ).descending() ) );
 	}
 
 }
