@@ -15,13 +15,19 @@ public class TenantService {
 	@Autowired
 	private TenantRepository tenantRepository;
 
-	public Tenant create(Tenant tenant) {
+	public Tenant create(Tenant tenant, String partnerCode) {
+		if (partnerCode != null) {
+			tenant.setPartner( isValidPartnerCode( partnerCode ) );
+		}
+
 		return tenantRepository.save( tenant );
 	}
 
+	private boolean isValidPartnerCode(String partnerCode) {
+		return partnerCode.equals( "PARCEIRO_POR_UM_ANO" );
+	}
+
 	public Tenant update(Tenant tenant, Tenant currentTenant) {
-		System.out.println( currentTenant );
-		System.out.println( tenant );
 		tenant.setUuid( currentTenant.getUuid() );
 		return tenantRepository.save( tenant );
 	}

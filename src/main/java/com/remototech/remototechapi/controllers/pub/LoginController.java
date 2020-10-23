@@ -82,11 +82,11 @@ public class LoginController {
 	}
 
 	@PostMapping("create")
-	public void create(@Valid @RequestBody Login login, @RequestParam(value = "linkedInCode", required = false) String linkedInCode, @RequestParam(value = "redirectUri", required = false) String redirectUri) throws GlobalException {
+	public void create(@Valid @RequestBody Login login, @RequestParam(value = "linkedInCode", required = false) String linkedInCode, @RequestParam(value = "redirectUri", required = false) String redirectUri, @RequestParam(value = "partnerCode", required = false) String partnerCode) throws GlobalException {
 		if (linkedInCode != null) {
-			loginService.createSocial( login, linkedInCode, redirectUri );
+			loginService.createSocial( login, linkedInCode, redirectUri, partnerCode );
 		} else {
-			loginService.create( login );
+			loginService.create( login, partnerCode );
 		}
 	}
 

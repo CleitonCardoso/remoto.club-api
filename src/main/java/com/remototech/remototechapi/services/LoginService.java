@@ -72,11 +72,11 @@ public class LoginService implements UserDetailsService {
 		return (UserDetails) findByUsername( username );
 	}
 
-	public void create(Login login) throws GlobalException {
+	public void create(Login login, String partnerCode) throws GlobalException {
 		validateLogin( login );
 		login.setPassword( passwordEncoder.encode( login.getPassword() ) );
 		if (login.getRole() == Role.COMPANY) {
-			Tenant tenant = tenantService.create( login.getTenant() );
+			Tenant tenant = tenantService.create( login.getTenant(), partnerCode );
 			login.setTenant( tenant );
 		}
 		Login loginSaved = loginRepository.save( login );
@@ -121,7 +121,7 @@ public class LoginService implements UserDetailsService {
 		return loginRepository.findByLinkedInId( linkedInId );
 	}
 
-	public void createSocial(Login login, String linkedInCode, String redirectUri) throws GlobalException {
+	public void createSocial(Login login, String linkedInCode, String redirectUri, String partnerCode) throws GlobalException {
 		validateLogin( login );
 
 		String linkedInId = linkedInService.getLinkedInId( linkedInCode, redirectUri );
@@ -130,7 +130,7 @@ public class LoginService implements UserDetailsService {
 
 		login.setLinkedInId( linkedInId );
 		login.setRole( Role.COMPANY );
-		Tenant tenant = tenantService.create( login.getTenant() );
+		Tenant tenant = tenantService.create( login.getTenant(), partnerCode );
 		login.setTenant( tenant );
 
 		Login loginSaved = loginRepository.save( login );

@@ -4,15 +4,13 @@ import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
-
-import org.hibernate.annotations.ColumnDefault;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonProperty.Access;
+import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -22,23 +20,21 @@ import lombok.NoArgsConstructor;
 @Data
 @Builder
 @Entity
+@Table(name = "jobs_candidates")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Tenant {
+public class Candidature {
 
 	@Id
 	@Column(columnDefinition = "uuid", updatable = false)
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
 	private UUID uuid;
 
-	@NotBlank(message = "Nome da empresa obrigatório.")
-	private String companyName;
-	private String phone;
-	private String contactEmail;
-	@ColumnDefault("true")
-	private boolean active;
-	@JsonProperty(access = Access.READ_ONLY)
-	@ColumnDefault("false")
-	private boolean partner;
+	@OneToOne
+	private Job job;
+	@OneToOne
+	private Candidate candidate;
+	@Enumerated(EnumType.STRING)
+	private CandidatureStatus status;
 
 }
