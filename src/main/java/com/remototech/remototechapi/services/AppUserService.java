@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.AppUser;
+import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.AppUserRepository;
@@ -14,6 +15,9 @@ public class AppUserService {
 
 	@Autowired
 	private AppUserRepository appUserRepository;
+
+	@Autowired
+	private CandidateService candidateService;
 
 	public AppUser findByLogin(Login login) {
 		return appUserRepository.findByLogin( login );
@@ -27,8 +31,15 @@ public class AppUserService {
 
 		boolean exists = appUserRepository.existsByUuidAndLogin( appUser.getUuid(), loggedUser );
 		if (exists) {
-			loggedUser.setEmail( appUser.getLogin().getEmail() );
-			loggedUser.setUsername( appUser.getLogin().getUsername() );
+			Login loginEdited = appUser.getLogin();
+
+			loggedUser.setEmail( loginEdited.getEmail() );
+			loggedUser.setUsername( loginEdited.getUsername() );
+			loggedUser.getCandidate().setName( appUser.getName() );
+			loggedUser.getCandidate().setLinkedInUrl( loginEdited.getCandidate().getLinkedInUrl() );
+
+			candidateService.update( loggedUser.getCandidate() );
+
 			appUser.setLogin( loggedUser );
 			return appUserRepository.save( appUser );
 		} else {

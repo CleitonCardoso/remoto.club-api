@@ -16,7 +16,7 @@ public class CandidateService {
 	public Candidate getOrCreateIfNotExists(Login login) {
 		Candidate candidate = repository.findByLogin( login );
 		if (candidate == null) {
-			candidate = Candidate.builder().login( login ).build();
+			candidate = Candidate.builder().login( login ).name( login.getUsername() ).build();
 			candidate = repository.save( candidate );
 		}
 		return candidate;

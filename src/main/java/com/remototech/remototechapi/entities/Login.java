@@ -77,6 +77,9 @@ public class Login implements UserDetails {
 	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid")
 	private Tenant tenant;
 
+	@OneToOne(mappedBy = "login")
+	private Candidate candidate;
+
 	@Enumerated(EnumType.STRING)
 	private Role role;
 

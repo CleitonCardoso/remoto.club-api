@@ -34,11 +34,12 @@ public class Candidate {
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
 	private UUID uuid;
 
-	private String nome;
+	private String name;
 	private String linkedInUrl;
 
 	@OneToOne
 	@JsonIgnore
+	@EqualsAndHashCode.Exclude
 	private Login login;
 
 	@ManyToMany
