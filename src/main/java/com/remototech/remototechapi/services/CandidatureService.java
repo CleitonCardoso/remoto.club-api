@@ -23,4 +23,8 @@ public class CandidatureService {
 		return repository.findByJobUuidAndCandidate( jobUuid, candidate );
 	}
 
+	public Candidature save(Candidature candidature) {
+		return repository.save( candidature );
+	}
+
 }

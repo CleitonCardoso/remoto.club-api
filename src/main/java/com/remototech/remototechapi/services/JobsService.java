@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
@@ -22,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.Candidate;
+import com.remototech.remototechapi.entities.Candidature;
+import com.remototech.remototechapi.entities.CandidatureStatus;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.Tenant;
@@ -37,6 +38,9 @@ public class JobsService {
 
 	@Autowired
 	private CandidateService candidateService;
+
+	@Autowired
+	private CandidatureService candidatureService;
 
 	public Page<Job> findAllByFilter(JobsFilter filter, Integer pageIndex, Integer resultSize) {
 		return findAllByFilterAndTenant( filter, pageIndex, resultSize, null );
@@ -151,12 +155,15 @@ public class JobsService {
 			}
 
 			Job job = jobOptional.get();
-			job.getCandidates().add( candidate );
-			candidate.getJobs().add( job );
-			candidateService.update( candidate );
-			repository.save( job );
-		}
 
+			Candidature candidature = Candidature.builder()
+					.candidate( candidate )
+					.job( job )
+					.status( CandidatureStatus.APPLIED )
+					.build();
+
+			candidatureService.save( candidature );
+		}
 	}
 
 	public Set<Candidate> getCandidatesFrom(UUID jobUuid, Tenant tenant) {
