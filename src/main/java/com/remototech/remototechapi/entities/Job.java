@@ -43,6 +43,8 @@ public class Job {
 
 	private String company;
 
+	private String officeLocation;
+
 	@NotBlank(message = "Tipo de contrato é obrigatório.")
 	private String contractType;
 
