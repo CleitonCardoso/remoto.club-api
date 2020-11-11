@@ -24,6 +24,7 @@ import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.CandidatureStatus;
 import com.remototech.remototechapi.entities.Job;
+import com.remototech.remototechapi.entities.JobStatus;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.Tenant;
 import com.remototech.remototechapi.exceptions.GlobalException;
@@ -122,9 +123,20 @@ public class JobsService {
 			};
 
 			query = query == null ? tenantSpec : query.and( tenantSpec );
+		} else {
+			Specification<Job> statusSpec = new Specification<Job>() {
+				private static final long serialVersionUID = -6945498614404875034L;
+
+				@Override
+				public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+					return root.get( "jobStatus" ).in( JobStatus.OPEN );
+				}
+
+			};
+			query = query == null ? statusSpec : query.and( statusSpec );
 		}
 
-		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "createdDate" ).descending() ) );
+		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "jobStatus" ).descending().and( Sort.by( "createdDate" ).descending() ) ) );
 	}
 
 	public Job create(Job job, Tenant tenant) {
@@ -134,7 +146,7 @@ public class JobsService {
 	}
 
 	public Job findByIdAndTenant(UUID uuid, Tenant tenant) {
-		return repository.findByUuidAndTenant( uuid, tenant );
+		return repository.findByUuidAndTenantOrderByJobStatusDesc( uuid, tenant );
 	}
 
 	@Transactional
@@ -167,7 +179,7 @@ public class JobsService {
 	}
 
 	public Set<Candidate> getCandidatesFrom(UUID jobUuid, Tenant tenant) {
-		Job job = repository.findByUuidAndTenant( jobUuid, tenant );
+		Job job = repository.findByUuidAndTenantOrderByJobStatusDesc( jobUuid, tenant );
 		if (job != null) {
 			return job.getCandidates();
 		}
@@ -256,6 +268,26 @@ public class JobsService {
 		query = query == null ? candidatesSpec : query.and( candidatesSpec );
 
 		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "createdDate" ).descending() ) );
+	}
+
+	public void close(UUID uuid, Tenant tenant) throws GlobalException {
+		Job job = repository.findByUuidAndTenantOrderByJobStatusDesc( uuid, tenant );
+		if (job != null) {
+			job.setJobStatus( JobStatus.CLOSED );
+			repository.save( job );
+		} else {
+			throw new GlobalException( "Vaga não encontrada!" );
+		}
+	}
+
+	public void reopen(UUID uuid, Tenant tenant) throws GlobalException {
+		Job job = repository.findByUuidAndTenantOrderByJobStatusDesc( uuid, tenant );
+		if (job != null) {
+			job.setJobStatus( JobStatus.OPEN );
+			repository.save( job );
+		} else {
+			throw new GlobalException( "Vaga não encontrada!" );
+		}
 	}
 
 }

@@ -21,6 +21,7 @@ import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.services.JobsService;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -55,6 +56,16 @@ public class MyJobsController extends LoggedInController {
 	@DeleteMapping("{uuid}")
 	public void remove(@PathVariable("uuid") UUID uuid) {
 		jobsService.removeByUuidAndTenant( uuid, getLoggedUser().getTenant() );
+	}
+
+	@PostMapping("/close/{uuid}")
+	public void close(@PathVariable("uuid") UUID uuid) throws GlobalException {
+		jobsService.close( uuid, getLoggedUser().getTenant() );
+	}
+
+	@PostMapping("/reopen/{uuid}")
+	public void reopen(@PathVariable("uuid") UUID uuid) throws GlobalException {
+		jobsService.reopen( uuid, getLoggedUser().getTenant() );
 	}
 
 	@GetMapping("{uuid}/candidates")

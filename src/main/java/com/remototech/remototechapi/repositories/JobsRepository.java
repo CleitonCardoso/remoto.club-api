@@ -11,7 +11,7 @@ import com.remototech.remototechapi.entities.Tenant;
 
 public interface JobsRepository extends JpaRepositoryImplementation<Job, UUID> {
 
-	public Job findByUuidAndTenant(UUID uuid, Tenant tenant);
+	public Job findByUuidAndTenantOrderByJobStatusDesc(UUID uuid, Tenant tenant);
 
 	public void removeByUuidAndTenant(UUID uuid, Tenant tenant);
 
