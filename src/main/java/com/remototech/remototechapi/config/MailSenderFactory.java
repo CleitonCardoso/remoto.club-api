@@ -29,11 +29,13 @@ public class MailSenderFactory {
 			mailSender.setUsername( mailConfiguration.getSmtpUsername() );
 			mailSender.setPassword( mailConfiguration.getSmtpPassword() );
 
+			mailSender.setDefaultEncoding( "UTF-8" );
+
 			Properties props = mailSender.getJavaMailProperties();
 			props.put( "mail.transport.protocol", "smtp" );
 			props.put( "mail.smtp.auth", "true" );
 			props.put( "mail.smtp.starttls.enable", "true" );
-
+			props.put( "mail.smtp.ssl.trust", "smtp.gmail.com" );
 		}
 		return mailSender;
 	}
