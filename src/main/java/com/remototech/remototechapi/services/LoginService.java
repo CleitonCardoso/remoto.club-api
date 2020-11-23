@@ -2,6 +2,8 @@ package com.remototech.remototechapi.services;
 
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -36,6 +38,9 @@ public class LoginService implements UserDetailsService {
 
 	@Autowired
 	private LinkedInService linkedInService;
+
+	@Autowired
+	private PasswordRecoveryService recoveryPasswordService;
 
 	public List<Login> findAll() {
 		log.info( "{} Listando todos os Logins" );
@@ -109,12 +114,12 @@ public class LoginService implements UserDetailsService {
 
 	}
 
-	public void recoveryPassword(String email) throws GlobalException {
+	public void recoveryPassword(String email) throws GlobalException, LoginException {
 		Login loginFound = loginRepository.findByEmail( email );
 		if (loginFound == null) {
 			throw new GlobalException( "Email não cadastrado no sistema." );
 		}
-
+		recoveryPasswordService.queueRecoveryPassword( loginFound );
 	}
 
 	public Login findByLinkedInId(String linkedInId) {
@@ -143,6 +148,11 @@ public class LoginService implements UserDetailsService {
 		if (loginRepository.existsByLinkedInId( linkedInId )) {
 			throw new GlobalException( "Usuário já cadastrado com o LinkedIn" );
 		}
+	}
+
+	public void setNewPassword(String recoveryHash, String newPassword) throws GlobalException {
+		String newPasswordEncoded = passwordEncoder.encode( newPassword );
+		recoveryPasswordService.recoveryPassword( recoveryHash, newPasswordEncoded );
 	}
 
 }

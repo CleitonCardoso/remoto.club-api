@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.controllers.pub;
 
+import javax.security.auth.login.LoginException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
 
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,7 +57,11 @@ public class LoginController {
 			else
 				return authenticateSocial( login, auth.getLinkedInCode() );
 		}
-		return authenticate( login, auth.getUsername(), auth.getPassword() );
+		if (login == null) {
+			return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).build();
+		} else {
+			return authenticate( login, auth.getUsername(), auth.getPassword() );
+		}
 	}
 
 	private ResponseEntity<?> authenticateSocial(Login login, String linkedInCode) {
@@ -91,7 +97,12 @@ public class LoginController {
 	}
 
 	@PostMapping("recovery")
-	public void recoveryPassword(@RequestParam("email") String email) throws GlobalException {
+	public void recoveryPassword(@RequestParam("email") String email) throws GlobalException, LoginException {
 		loginService.recoveryPassword( email );
+	}
+
+	@PostMapping("perform-recovery/")
+	public void recoveryPassword(@RequestParam("recoveryHash") String recoveryHash, @RequestParam("newPassword") String newPassword) throws GlobalException, LoginException {
+		loginService.setNewPassword( recoveryHash, newPassword );
 	}
 }

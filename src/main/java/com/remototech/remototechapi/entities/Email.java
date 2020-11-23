@@ -47,6 +47,7 @@ public class Email {
 
 	private LocalDateTime lastUpdate;
 
+	@Column(length = 8192)
 	private String text;
 
 	@Enumerated(EnumType.STRING)
