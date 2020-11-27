@@ -17,4 +17,7 @@ public interface JobsRepository extends JpaRepositoryImplementation<Job, UUID> {
 
 	public boolean existsByUuidAndCandidatesIn(UUID jobUuid, List<Candidate> candidates);
 
+	public Job findByUuidOrderByJobStatusDesc(UUID uuid);
+
+
 }

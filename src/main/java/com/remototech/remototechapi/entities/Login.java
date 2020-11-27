@@ -1,7 +1,9 @@
 package com.remototech.remototechapi.entities;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.UUID;
 
 import javax.persistence.CascadeType;
@@ -18,12 +20,12 @@ import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -98,12 +100,11 @@ public class Login implements UserDetails {
 		lastUpdate = LocalDateTime.now();
 	}
 
-	@Transient
-	private Collection<? extends GrantedAuthority> authorities;
-
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return authorities;
+		List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();
+		list.add( new SimpleGrantedAuthority( role.name() ) );
+		return list;
 	}
 
 	@JsonIgnore

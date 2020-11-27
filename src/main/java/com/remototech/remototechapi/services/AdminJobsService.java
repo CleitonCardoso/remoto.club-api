@@ -1,8 +1,6 @@
 package com.remototech.remototechapi.services;
 
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -21,18 +19,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.Candidate;
-import com.remototech.remototechapi.entities.Candidature;
-import com.remototech.remototechapi.entities.CandidatureStatus;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.JobStatus;
 import com.remototech.remototechapi.entities.Login;
-import com.remototech.remototechapi.entities.Tenant;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.JobsRepository;
 import com.remototech.remototechapi.vos.JobsFilter;
 
 @Service
-public class JobsService {
+public class AdminJobsService {
 
 	@Autowired
 	private JobsRepository repository;
@@ -40,14 +35,7 @@ public class JobsService {
 	@Autowired
 	private CandidateService candidateService;
 
-	@Autowired
-	private CandidatureService candidatureService;
-
-	public Page<Job> findAllByFilter(JobsFilter filter, Integer pageIndex, Integer resultSize) {
-		return findAllByFilterAndTenant( filter, pageIndex, resultSize, null );
-	}
-
-	public Page<Job> findAllByFilterAndTenant(JobsFilter filter, int pageIndex, Integer resultSize, Tenant tenant) {
+	public Page<Job> findAllByFilter(JobsFilter filter, int pageIndex, Integer resultSize) {
 		List<String> contractTypes = filter.getContractTypes();
 		List<String> keyWords = filter.getKeyWords();
 		List<String> experienceTypes = filter.getExperienceTypes();
@@ -111,76 +99,35 @@ public class JobsService {
 			query = query == null ? experienceTypesSpec : query.and( experienceTypesSpec );
 		}
 
-		if (tenant != null) {
-			Specification<Job> tenantSpec = new Specification<Job>() {
-				private static final long serialVersionUID = -6945498614404875034L;
+		Specification<Job> tenantSpec = new Specification<Job>() {
+			private static final long serialVersionUID = -6945498614404875034L;
 
-				@Override
-				public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-					return root.get( "tenant" ).in( tenant );
-				}
-
-			};
-
-			query = query == null ? tenantSpec : query.and( tenantSpec );
-		} else {
-			Specification<Job> statusSpec = new Specification<Job>() {
-				private static final long serialVersionUID = -6945498614404875034L;
-
-				@Override
-				public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-					return root.get( "jobStatus" ).in( JobStatus.OPEN );
-				}
-
-			};
-			query = query == null ? statusSpec : query.and( statusSpec );
-		}
+			@Override
+			public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				return root.get( "tenant" ).isNull();
+			}
+		};
+		query = query == null ? tenantSpec : query.and( tenantSpec );
 
 		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "jobStatus" ).descending().and( Sort.by( "createdDate" ).descending() ) ) );
 	}
 
-	public Job create(Job job, Tenant tenant) {
-		job.setTenant( tenant );
-		job.setCompany( tenant.getCompanyName() );
+	public Job create(Job job) {
 		job.setJobStatus( JobStatus.OPEN );
 		return repository.save( job );
 	}
 
-	public Job findByIdAndTenant(UUID uuid, Tenant tenant) {
-		return repository.findByUuidAndTenantOrderByJobStatusDesc( uuid, tenant );
+	public Job findById(UUID uuid) {
+		return repository.findById( uuid ).orElse( null );
 	}
 
 	@Transactional
-	public void removeByUuidAndTenant(UUID uuid, Tenant tenant) {
-		repository.removeByUuidAndTenant( uuid, tenant );
+	public void removeByUuid(UUID uuid) {
+		repository.deleteById( uuid );
 	}
 
-	public void apply(UUID jobUuid, Login login) throws GlobalException {
-		Candidate candidate = candidateService.getOrCreateIfNotExists( login );
-
-		Optional<Job> jobOptional = repository.findById( jobUuid );
-
-		if (jobOptional.isPresent()) {
-			boolean alreadyApplied = repository.existsByUuidAndCandidatesIn( jobUuid, Arrays.asList( candidate ) );
-
-			if (alreadyApplied) {
-				throw new GlobalException( "Você já se aplicou para esta vaga" );
-			}
-
-			Job job = jobOptional.get();
-
-			Candidature candidature = Candidature.builder()
-					.candidate( candidate )
-					.job( job )
-					.status( CandidatureStatus.APPLIED )
-					.build();
-
-			candidatureService.save( candidature );
-		}
-	}
-
-	public Set<Candidate> getCandidatesFrom(UUID jobUuid, Tenant tenant) {
-		Job job = repository.findByUuidAndTenantOrderByJobStatusDesc( jobUuid, tenant );
+	public Set<Candidate> getCandidatesFrom(UUID jobUuid) {
+		Job job = repository.findByUuidOrderByJobStatusDesc( jobUuid );
 		if (job != null) {
 			return job.getCandidates();
 		}
@@ -271,8 +218,8 @@ public class JobsService {
 		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "createdDate" ).descending() ) );
 	}
 
-	public void close(UUID uuid, Tenant tenant) throws GlobalException {
-		Job job = repository.findByUuidAndTenantOrderByJobStatusDesc( uuid, tenant );
+	public void close(UUID uuid) throws GlobalException {
+		Job job = repository.findByUuidOrderByJobStatusDesc( uuid );
 		if (job != null) {
 			job.setJobStatus( JobStatus.CLOSED );
 			repository.save( job );
@@ -281,8 +228,8 @@ public class JobsService {
 		}
 	}
 
-	public void reopen(UUID uuid, Tenant tenant) throws GlobalException {
-		Job job = repository.findByUuidAndTenantOrderByJobStatusDesc( uuid, tenant );
+	public void reopen(UUID uuid) throws GlobalException {
+		Job job = repository.findByUuidOrderByJobStatusDesc( uuid );
 		if (job != null) {
 			job.setJobStatus( JobStatus.OPEN );
 			repository.save( job );
