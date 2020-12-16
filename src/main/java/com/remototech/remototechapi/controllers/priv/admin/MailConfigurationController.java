@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.controllers.priv.admin;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -13,6 +14,7 @@ import com.remototech.remototechapi.services.MailConfigurationService;
 
 @RestController
 @RequestMapping("private/admin/mail-config")
+@PreAuthorize("hasAuthority('ADMIN')")
 public class MailConfigurationController {
 
 	@Autowired
