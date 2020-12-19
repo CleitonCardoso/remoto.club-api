@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.remototech.remototechapi.entities.AppUser;
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.entities.Role;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.AppUserRepository;
 
@@ -35,10 +36,11 @@ public class AppUserService {
 
 			loggedUser.setEmail( loginEdited.getEmail() );
 			loggedUser.setUsername( loginEdited.getUsername() );
-			loggedUser.getCandidate().setName( appUser.getName() );
-			loggedUser.getCandidate().setLinkedInUrl( loginEdited.getCandidate().getLinkedInUrl() );
-
-			candidateService.update( loggedUser.getCandidate() );
+			if (Role.CANDIDATE.equals( loggedUser.getRole() ) && loggedUser.getCandidate() != null) {
+				loggedUser.getCandidate().setName( appUser.getName() );
+				loggedUser.getCandidate().setLinkedInUrl( loginEdited.getCandidate().getLinkedInUrl() );
+				candidateService.update( loggedUser.getCandidate() );
+			}
 
 			appUser.setLogin( loggedUser );
 			return appUserRepository.save( appUser );

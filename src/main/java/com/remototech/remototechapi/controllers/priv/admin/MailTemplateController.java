@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.controllers.priv.admin;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,16 +16,30 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.remototech.remototechapi.controllers.LoggedInController;
+import com.remototech.remototechapi.entities.AppUser;
+import com.remototech.remototechapi.entities.Email;
+import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.MailTemplate;
+import com.remototech.remototechapi.services.EmailService;
 import com.remototech.remototechapi.services.MailTemplateService;
+import com.remototech.remototechapi.services.TemplateProcessorService;
+
+import freemarker.template.TemplateException;
 
 @RestController
 @RequestMapping("private/admin/mail-template")
 @PreAuthorize("hasAuthority('ADMIN')")
-public class MailTemplateController {
+public class MailTemplateController extends LoggedInController {
 
 	@Autowired
 	private MailTemplateService mailTemplateService;
+
+	@Autowired
+	private EmailService emailService;
+
+	@Autowired
+	private TemplateProcessorService templateProcessor;
 
 	@PostMapping
 	public MailTemplate saveTemplate(@Valid @RequestBody MailTemplate mailTemplate) {
@@ -44,6 +59,26 @@ public class MailTemplateController {
 	@DeleteMapping("{uuid}")
 	public void delete(@PathVariable("uuid") UUID uuid) {
 		mailTemplateService.delete( uuid );
+	}
+
+	@PostMapping("test")
+	public void sendTestEmail(@RequestBody String template) throws TemplateException, IOException {
+		Login loggedUser = getLoggedUser();
+		AppUser user = loggedUser.getUser();
+
+		user.getLogin();
+		user.getName();
+
+		String resultTemplate = templateProcessor.processTemplate( template, user );
+
+		Email email = Email.builder()
+				.sender( "contato@remoto.club" )
+				.destinatary( "cleitoncardoso.dev@outlook.com" )
+				.subject( "Email de teste de template - Portal.Club" )
+				.text( resultTemplate )
+				.build();
+
+		emailService.send( email );
 	}
 
 }

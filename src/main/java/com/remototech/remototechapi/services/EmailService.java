@@ -26,7 +26,7 @@ import lombok.extern.log4j.Log4j2;
 public class EmailService {
 
 	@Autowired
-	public JavaMailSender emailSender;
+	private JavaMailSender emailSender;
 
 	@Autowired
 	private EmailRepository emailRepository;

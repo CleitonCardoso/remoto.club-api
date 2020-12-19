@@ -100,6 +100,7 @@ public class Login implements UserDetails {
 		lastUpdate = LocalDateTime.now();
 	}
 
+	@JsonIgnore
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> list = new ArrayList<GrantedAuthority>();

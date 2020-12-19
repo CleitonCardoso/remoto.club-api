@@ -35,7 +35,7 @@ public class MailTemplate {
 	
 	private String title;
 	
-	@Column(length = 9254)
+	@Column(length = 16254)
 	private String design;
 
 }

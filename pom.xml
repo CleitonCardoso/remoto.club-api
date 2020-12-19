@@ -105,6 +105,12 @@
 			<version>2.1.4.RELEASE</version>
 		</dependency>
 
+		<dependency>
+			<groupId>org.freemarker</groupId>
+			<artifactId>freemarker</artifactId>
+		</dependency>
+
+
 	</dependencies>
 
 	<build>

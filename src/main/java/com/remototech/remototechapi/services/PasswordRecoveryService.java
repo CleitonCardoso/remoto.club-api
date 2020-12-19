@@ -59,7 +59,7 @@ public class PasswordRecoveryService {
 		Email email = Email.builder()
 				.sender( "contato@remoto.club" )
 				.destinatary( login.getEmail() )
-				.subject( "Recuperação de senha - Portal.Club" )
+				.subject( "Recuperação de senha - Remoto.Club" )
 				.text( buildMailContentFor( passwordRecovery ) )
 				.build();
 		emailService.queueToSend( email );
