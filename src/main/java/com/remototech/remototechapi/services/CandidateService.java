@@ -1,5 +1,7 @@
 package com.remototech.remototechapi.services;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,10 @@ public class CandidateService {
 
 	public void update(Candidate candidate) {
 		repository.save( candidate );
+	}
+
+	public List<Candidate> findCandidatesWithIncompleteProfile() {
+		return repository.findAllWithIncompleteInfo();
 	}
 
 }

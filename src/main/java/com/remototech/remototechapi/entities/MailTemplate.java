@@ -1,10 +1,11 @@
 package com.remototech.remototechapi.entities;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -32,10 +33,17 @@ public class MailTemplate {
 	private UUID uuid;
 	@Version
 	private Long version;
-	
+
 	private String title;
-	
+
 	@Column(length = 16254)
 	private String design;
+
+	@Column(length = 16254, updatable = true)
+	private String html;
+
+	@Enumerated(EnumType.STRING)
+	@Column(updatable = true)
+	private JobTemplateType jobTemplateType;
 
 }

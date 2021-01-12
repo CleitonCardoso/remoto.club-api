@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.remototech.remototechapi.entities.AppUser;
+import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.Role;
 import com.remototech.remototechapi.entities.Tenant;
@@ -38,6 +39,9 @@ public class LoginService implements UserDetailsService {
 
 	@Autowired
 	private LinkedInService linkedInService;
+	
+	@Autowired
+	private CandidateService candidateService;
 
 	@Autowired
 	private PasswordRecoveryService recoveryPasswordService;
@@ -84,7 +88,13 @@ public class LoginService implements UserDetailsService {
 			Tenant tenant = tenantService.create( login.getTenant(), partnerCode );
 			login.setTenant( tenant );
 		}
+		
 		Login loginSaved = loginRepository.save( login );
+
+		if(login.getRole() == Role.CANDIDATE) {
+			Candidate candidate = candidateService.getOrCreateIfNotExists( loginSaved );
+			loginSaved.setCandidate( candidate );
+		}
 
 		AppUser appUser = AppUser.builder()
 				.name( login.getUsername() )

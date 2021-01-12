@@ -4,8 +4,10 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import com.remototech.remototechapi.entities.JobTemplateType;
 import com.remototech.remototechapi.entities.MailTemplate;
 import com.remototech.remototechapi.repositories.MailTemplateRepository;
 
@@ -29,6 +31,10 @@ public class MailTemplateService {
 
 	public void delete(UUID uuid) {
 		mailTemplateRepository.deleteById( uuid );
+	}
+
+	public MailTemplate findByJobTemplateType(JobTemplateType jobTemplateType) {
+		return mailTemplateRepository.findOne( Example.of( MailTemplate.builder().jobTemplateType( jobTemplateType ).build() ) ).get();
 	}
 
 }
