@@ -19,8 +19,8 @@ public class IncompleteProfileProcessor {
 	private IncompleteProfileProcessorService service;
 
 	// 7 SEGUNDOS
-	@Scheduled(cron = "0 0 0 1 1/1 *", initialDelay = 1000)
-	public void sendQueuedEmails() throws TemplateException, IOException {
+	@Scheduled(cron = "0 0 0 1 1/1 *")
+	public void processIncompleteProfile() throws TemplateException, IOException {
 		log.info( "## Inicializando rotina de lembrete de perfis ##" );
 		service.processIncompleteProfile();
 		log.info( "## Lembrete de perfis finalizado ##" );
