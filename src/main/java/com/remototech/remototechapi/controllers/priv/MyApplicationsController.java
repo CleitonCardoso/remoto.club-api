@@ -1,6 +1,7 @@
 package com.remototech.remototechapi.controllers.priv;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,6 +43,12 @@ public class MyApplicationsController extends LoggedInController {
 	public Candidature getCandidature(@PathVariable("job_uuid") UUID jobUuid) {
 		Login loggedUser = getLoggedUser();
 		return candidatureService.findByJobUuidAndCandidate( jobUuid, loggedUser );
+	}
+
+	@GetMapping("/all")
+	public List <Candidature> getAllApplications() {
+		Login loggedUser = getLoggedUser();
+		return candidatureService.findByCandidate( loggedUser.getUuid() );
 	}
 
 }
