@@ -376,7 +376,7 @@ public class JobsService {
 
 		query = query == null ? candidatesSpec : query.and( candidatesSpec );
 
-		return candidatureRepository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by(  ("job.createdDate" )).descending() ) );
+		return candidatureRepository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by(  "job.createdDate" ).descending() ) );
 	}
 
 }
