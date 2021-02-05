@@ -12,7 +12,6 @@ import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
-import com.remototech.remototechapi.repositories.CandidatureRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,9 +42,6 @@ public class JobsService {
 
 	@Autowired
 	private CandidatureService candidatureService;
-
-	@Autowired
-	private CandidatureRepository candidatureRepository;
 
 	public Page<Job> findAllByFilter(JobsFilter filter, Integer pageIndex, Integer resultSize) {
 		return findAllByFilterAndTenant( filter, pageIndex, resultSize, null );
