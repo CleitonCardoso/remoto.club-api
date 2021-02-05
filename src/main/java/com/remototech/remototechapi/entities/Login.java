@@ -90,6 +90,9 @@ public class Login implements UserDetails {
 
 	private LocalDateTime lastUpdate;
 
+	@Column(updatable = true)
+	private boolean active;
+
 	@PrePersist
 	public void prePersist() {
 		createdDate = LocalDateTime.now();

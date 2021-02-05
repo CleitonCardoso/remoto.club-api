@@ -52,12 +52,12 @@ public class LoginController {
 			String linkedInId = linkedInService.getLinkedInId( auth.getLinkedInCode(), auth.getRedirectUri() );
 			login = loginService.findByLinkedInId( linkedInId );
 
-			if (login == null)
+			if (login == null || !login.isActive())
 				return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).build();
 			else
 				return authenticateSocial( login, auth.getLinkedInCode() );
 		}
-		if (login == null) {
+		if (login == null || !login.isActive()) {
 			return ResponseEntity.status( HttpStatus.UNAUTHORIZED ).build();
 		} else {
 			return authenticate( login, auth.getUsername(), auth.getPassword() );
