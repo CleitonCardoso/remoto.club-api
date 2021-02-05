@@ -1,29 +1,34 @@
 package com.remototech.remototechapi.services;
 
-import java.io.UnsupportedEncodingException;
+import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.remototech.remototechapi.entities.Email;
+import com.remototech.remototechapi.entities.JobTemplateType;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.entities.MailTemplate;
 import com.remototech.remototechapi.entities.PasswordRecovery;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.LoginRepository;
 import com.remototech.remototechapi.repositories.PasswordRecoveryRepository;
 
-import org.springframework.beans.factory.annotation.Value;
+import freemarker.template.TemplateException;
 
 @Service
 public class PasswordRecoveryService {
@@ -37,11 +42,17 @@ public class PasswordRecoveryService {
 	@Autowired
 	private LoginRepository loginRepository;
 
+	@Autowired
+	private MailTemplateService mailTemplateService;
+
+	@Autowired
+	private TemplateProcessorService templateProcessorService;
+
 	@Value("${frontend-url}")
 	public String frontendUrl;
 
 	@Async
-	public void queueRecoveryPassword(Login loginFound) throws LoginException {
+	public void queueRecoveryPassword(Login loginFound) throws LoginException, GlobalException {
 		if (loginFound != null) {
 			disablePreviousRequestsFor( loginFound );
 			createNewPasswordRecoveryFor( loginFound );
@@ -50,12 +61,16 @@ public class PasswordRecoveryService {
 		}
 	}
 
-	private void createNewPasswordRecoveryFor(Login login) {
-		PasswordRecovery passwordRecovery = buildHashAndReturnRequest( login );
-		buildMailAndQueueToSend( login, passwordRecovery );
+	private void createNewPasswordRecoveryFor(Login login) throws GlobalException {
+		try {
+			PasswordRecovery passwordRecovery = buildHashAndReturnRequest( login );
+			buildMailAndQueueToSend( login, passwordRecovery );
+		} catch (TemplateException | IOException e) {
+			throw new GlobalException( "Houve um erro na tentativa de recuperação de senha, por favor, entre em contato com contato@remoto.club", e );
+		}
 	}
 
-	private void buildMailAndQueueToSend(Login login, PasswordRecovery passwordRecovery) {
+	private void buildMailAndQueueToSend(Login login, PasswordRecovery passwordRecovery) throws TemplateException, IOException {
 		Email email = Email.builder()
 				.sender( "contato@remoto.club" )
 				.destinatary( login.getEmail() )
@@ -68,24 +83,17 @@ public class PasswordRecoveryService {
 		recoveryRepository.save( passwordRecovery );
 	}
 
-	private String buildMailContentFor(PasswordRecovery passwordRecovery) {
-		String username = passwordRecovery.getLogin().getUsername();
+	private String buildMailContentFor(PasswordRecovery passwordRecovery) throws TemplateException, IOException {
+		MailTemplate mailTemplate = mailTemplateService.findByJobTemplateType( JobTemplateType.PASSWORD_RECOVERY );
 
-		StringBuilder emailContent = new StringBuilder( "Olá " + username + ", " );
-		emailContent.append( "<br>"
-				+ "<br>" );
-		emailContent.append( "Você está recebendo este email porque foi solicitado uma recuperação de senha no <strong>Remoto.Club</strong>. Caso você não tenha conhecimento desta ação, ignore." );
-		emailContent.append( "<br>"
-				+ "<br>"
-				+ "<br>" );
-		emailContent.append( "Clique no link para recuperar sua senha: " );
-		try {
-			emailContent.append( "<a href=\"" + frontendUrl + "/new-password?recoveryHash=" + URLEncoder.encode( passwordRecovery.getRecoveryHash(), StandardCharsets.UTF_8.toString() ) + "\"> Recuperar Senha </a>" );
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+		String passwordRecoveryUrl = frontendUrl + "/new-password?recoveryHash=" + URLEncoder.encode( passwordRecovery.getRecoveryHash(), StandardCharsets.UTF_8.toString() );
 
-		return emailContent.toString();
+		Map<String, Object> dataModel = new LinkedHashMap<>();
+		dataModel.put( "login", passwordRecovery.getLogin() );
+		dataModel.put( "passwordRecoveryUrl", passwordRecoveryUrl );
+
+		String content = templateProcessorService.processTemplate( mailTemplate.getHtml(), dataModel );
+		return content;
 	}
 
 	private PasswordRecovery buildHashAndReturnRequest(Login login) {

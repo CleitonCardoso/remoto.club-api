@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 @Service
 @Slf4j
-public class IncompleteProfileProcessorService {
+public class IncompleteProfileNotificationService {
 
 	@Autowired
 	private CandidateService candidateService;

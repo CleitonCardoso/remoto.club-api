@@ -1,13 +1,10 @@
 package com.remototech.remototechapi;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import java.io.Writer;
-import java.util.HashMap;
-import java.util.Map;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;

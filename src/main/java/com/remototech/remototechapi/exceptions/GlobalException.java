@@ -11,4 +11,8 @@ public class GlobalException extends Exception {
 		super( message );
 	}
 
+	public GlobalException(String message, Exception e) {
+		super( message, e );
+	}
+
 }

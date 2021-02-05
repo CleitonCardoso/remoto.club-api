@@ -2,7 +2,6 @@ package com.remototech.remototechapi.services;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -49,7 +48,7 @@ public class CandidatureService {
 
 			@Override
 			public Predicate toPredicate(Root<Candidature> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-				return root.get("job").get( "contractType" ).in( contractTypes );
+				return root.get( "job" ).get( "contractType" ).in( contractTypes );
 			}
 
 		};
@@ -61,17 +60,17 @@ public class CandidatureService {
 			public Predicate toPredicate(Root<Candidature> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
 				Predicate predicate = null;
 				for (String keyWord : keyWords) {
-					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "title" ) ), "%" + keyWord.toUpperCase() + "%" );
+					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "job" ).get( "title" ) ), "%" + keyWord.toUpperCase() + "%" );
 					predicate = predicate == null ? insidePredicate : criteriaBuilder.or( predicate, insidePredicate );
 				}
 
 				for (String keyWord : keyWords) {
-					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "description" ) ), "%" + keyWord.toUpperCase() + "%" );
+					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "job" ).get( "description" ) ), "%" + keyWord.toUpperCase() + "%" );
 					predicate = predicate == null ? insidePredicate : criteriaBuilder.or( predicate, insidePredicate );
 				}
 
 				for (String keyWord : keyWords) {
-					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "company" ) ), "%" + keyWord.toUpperCase() + "%" );
+					Predicate insidePredicate = criteriaBuilder.like( criteriaBuilder.upper( root.get( "job" ).get( "company" ) ), "%" + keyWord.toUpperCase() + "%" );
 					predicate = predicate == null ? insidePredicate : criteriaBuilder.or( predicate, insidePredicate );
 				}
 				return predicate;
@@ -84,7 +83,7 @@ public class CandidatureService {
 
 			@Override
 			public Predicate toPredicate(Root<Candidature> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-				return root.get("job").get( "experienceRequired" ).in( experienceTypes );
+				return root.get( "job" ).get( "experienceRequired" ).in( experienceTypes );
 			}
 
 		};
@@ -110,16 +109,13 @@ public class CandidatureService {
 
 			@Override
 			public Predicate toPredicate(Root<Candidature> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
-				return root.get("job").get( "uuid" ).in( candidate.getJobs()
-						.stream()
-						.map( candidate -> candidate.getUuid() )
-						.collect( Collectors.toList() ) );
+				return root.get( "candidate" ).get( "uuid" ).in( candidate.getUuid() );
 			}
 
 		};
 
 		query = query == null ? candidatesSpec : query.and( candidatesSpec );
 
-		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by(  "job.createdDate" ).descending() ) );
+		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "job.createdDate" ).descending() ) );
 	}
 }

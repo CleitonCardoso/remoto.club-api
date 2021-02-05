@@ -1,6 +1,9 @@
 package com.remototech.remototechapi.services;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
 
@@ -19,6 +22,7 @@ import com.remototech.remototechapi.entities.Tenant;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.LoginRepository;
 
+import freemarker.template.TemplateException;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -39,12 +43,15 @@ public class LoginService implements UserDetailsService {
 
 	@Autowired
 	private LinkedInService linkedInService;
-	
+
 	@Autowired
 	private CandidateService candidateService;
 
 	@Autowired
 	private PasswordRecoveryService recoveryPasswordService;
+
+	@Autowired
+	private AccountCreationNotificationService accountCreationNotificationService;
 
 	public List<Login> findAll() {
 		log.info( "{} Listando todos os Logins" );
@@ -71,9 +78,9 @@ public class LoginService implements UserDetailsService {
 		this.loginRepository.delete( login );
 	}
 
-	public void deleteById(Integer id_login) {
-		log.info( "{} Removendo Logins por id " + id_login );
-		this.loginRepository.deleteById( id_login );
+	public void deleteById(UUID uuid) {
+		log.info( "{} Removendo Logins por id " + uuid );
+		this.loginRepository.deleteById( uuid );
 	}
 
 	@Override
@@ -88,10 +95,10 @@ public class LoginService implements UserDetailsService {
 			Tenant tenant = tenantService.create( login.getTenant(), partnerCode );
 			login.setTenant( tenant );
 		}
-		
+
 		Login loginSaved = loginRepository.save( login );
 
-		if(login.getRole() == Role.CANDIDATE) {
+		if (login.getRole() == Role.CANDIDATE) {
 			Candidate candidate = candidateService.getOrCreateIfNotExists( loginSaved );
 			loginSaved.setCandidate( candidate );
 		}
@@ -106,6 +113,12 @@ public class LoginService implements UserDetailsService {
 		}
 
 		appUserService.save( appUser );
+
+		try {
+			accountCreationNotificationService.notify( loginSaved );
+		} catch (TemplateException | IOException e) {
+			log.error( "Não foi possível notificar a criação de conta por email." );
+		}
 	}
 
 	private void validateLogin(Login login) throws GlobalException {
@@ -152,6 +165,11 @@ public class LoginService implements UserDetailsService {
 
 		AppUser appUser = AppUser.builder().name( login.getUsername() ).login( loginSaved ).tenant( tenant ).build();
 		appUserService.save( appUser );
+		try {
+			accountCreationNotificationService.notify( loginSaved );
+		} catch (TemplateException | IOException e) {
+			log.error( "Não foi possível notificar a criação de conta por email." );
+		}
 	}
 
 	private void validateLinkedinId(String linkedInId) throws GlobalException {
@@ -163,6 +181,21 @@ public class LoginService implements UserDetailsService {
 	public void setNewPassword(String recoveryHash, String newPassword) throws GlobalException {
 		String newPasswordEncoded = passwordEncoder.encode( newPassword );
 		recoveryPasswordService.recoveryPassword( recoveryHash, newPasswordEncoded );
+	}
+
+	public void confirm(UUID loginUuid) throws GlobalException {
+		Optional<Login> loginReturn = loginRepository.findById( loginUuid );
+		if (loginReturn.isEmpty())
+			throw new GlobalException( "Conta não encontrada" );
+		else {
+			Login login = loginReturn.get();
+			if(login.isActive())
+				throw new GlobalException( "A conta já se encontra ativa" );
+			else {
+				login.setActive( true );
+				loginRepository.save( login );
+			}
+		}
 	}
 
 }

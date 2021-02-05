@@ -84,7 +84,6 @@ public class EmailService {
 			sendSimpleMessage( email.getSender(), email.getDestinatary(), email.getSubject(), email.getText() );
 			email.setStatus( EmailStatus.SENT );
 		} catch (Exception e) {
-			// TODO FAZER LOG
 			log.error( "Email não enviado", e );
 			email.setStatus( EmailStatus.ERROR );
 		}

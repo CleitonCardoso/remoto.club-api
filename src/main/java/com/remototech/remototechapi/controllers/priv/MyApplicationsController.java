@@ -1,16 +1,21 @@
 package com.remototech.remototechapi.controllers.priv;
 
+import java.io.IOException;
+import java.util.UUID;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.services.CandidatureService;
 import com.remototech.remototechapi.vos.JobsFilter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("private/my-applications")
