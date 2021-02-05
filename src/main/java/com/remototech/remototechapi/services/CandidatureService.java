@@ -5,10 +5,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import com.remototech.remototechapi.entities.*;
-import com.remototech.remototechapi.repositories.CandidateRepository;
-import com.remototech.remototechapi.repositories.JobsRepository;
-import com.remototech.remototechapi.repositories.LoginRepository;
-import com.remototech.remototechapi.vos.JobsFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,10 +28,6 @@ public class CandidatureService {
 	private CandidateService candidateService;
 	@Autowired
 	private CandidateRepository candidateRepository;
-	@Autowired
-	private LoginRepository loginRepository;
-	@Autowired
-	private JobsRepository jobsRepository;
 
 	public Candidature findByJobUuidAndCandidate(UUID jobUuid, Login loggedUser) {
 		Candidate candidate = candidateService.getOrCreateIfNotExists( loggedUser );
