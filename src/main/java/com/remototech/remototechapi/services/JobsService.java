@@ -311,7 +311,7 @@ public class JobsService {
 		};
 
 		Specification<Candidature> keyWordsSpec = new Specification<Candidature>() {
-			private static final long serialVersionUID = 9164462953718514652L;
+			private static final long serialVersionUID = -4185378444194323781L;
 
 			@Override
 			public Predicate toPredicate(Root<Candidature> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
