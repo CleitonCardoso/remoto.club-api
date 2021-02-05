@@ -45,10 +45,13 @@ public class MyApplicationsController extends LoggedInController {
 		return candidatureService.findByJobUuidAndCandidate( jobUuid, loggedUser );
 	}
 
-	@GetMapping("/all")
-	public List <Candidature> getAllApplications() {
-		Login loggedUser = getLoggedUser();
-		return candidatureService.findByCandidate( loggedUser.getUuid() );
-	}
+    @GetMapping("/allByFilter")
+    public Page<Candidature> findAllByFilterAndCandidature(
+            final @RequestParam(value = "page-index", defaultValue = "0", required = false) Integer pageIndex,
+            final @RequestParam(value = "result-size", defaultValue = "10", required = false) Integer resultSize,
+            JobsFilter filter) throws IOException {
+        Login loggedUser = getLoggedUser();
+        return jobsService.findAllByFilterAndCandidature( filter, pageIndex - 1, resultSize, loggedUser );
+    }
 
 }
