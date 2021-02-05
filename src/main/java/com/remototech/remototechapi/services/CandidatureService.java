@@ -4,7 +4,11 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import com.remototech.remototechapi.entities.*;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -12,12 +16,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.remototech.remototechapi.entities.Candidate;
+import com.remototech.remototechapi.entities.Candidature;
+import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.repositories.CandidatureRepository;
-
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
+import com.remototech.remototechapi.vos.JobsFilter;
 
 @Service
 public class CandidatureService {
@@ -26,8 +29,6 @@ public class CandidatureService {
 	private CandidatureRepository repository;
 	@Autowired
 	private CandidateService candidateService;
-	@Autowired
-	private CandidateRepository candidateRepository;
 
 	public Candidature findByJobUuidAndCandidate(UUID jobUuid, Login loggedUser) {
 		Candidate candidate = candidateService.getOrCreateIfNotExists( loggedUser );
