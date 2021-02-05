@@ -5,7 +5,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.AppUser;
-import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.Role;
 import com.remototech.remototechapi.exceptions.GlobalException;

@@ -1,5 +1,7 @@
 package com.remototech.remototechapi.controllers.pub;
 
+import java.util.UUID;
+
 import javax.security.auth.login.LoginException;
 import javax.transaction.Transactional;
 import javax.validation.Valid;
@@ -94,6 +96,11 @@ public class LoginController {
 		} else {
 			loginService.create( login, partnerCode );
 		}
+	}
+
+	@PostMapping("confirm/{login-uuid}")
+	public void confirm(@PathVariable("login-uuid") UUID loginUuid) throws GlobalException {
+		loginService.confirm( loginUuid );
 	}
 
 	@PostMapping("recovery")

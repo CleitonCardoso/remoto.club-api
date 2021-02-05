@@ -1,8 +1,11 @@
 package com.remototech.remototechapi.services;
 
 import java.io.IOException;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +28,9 @@ public class AccountCreationNotificationService {
 
 	@Autowired
 	private EmailService emailService;
+	
+	@Value("${frontend-url}")
+	private String frontendUrl;
 
 	@Async
 	public void notify(Login login) throws TemplateException, IOException {
@@ -38,7 +44,13 @@ public class AccountCreationNotificationService {
 			template = mailTemplateService.findByJobTemplateType( JobTemplateType.RECRUITER_ACCOUNT_SUCCESS );
 		}
 
-		String mailContent = templateProcessorService.processTemplate( template.getHtml(), login );
+		String confirmationUrl = frontendUrl + "/confirm/" + login.getUuid();
+		
+		Map<String, Object> dataModel = new LinkedHashMap<>();
+		dataModel.put( "login", login );
+		dataModel.put( "confirmationUrl", confirmationUrl );
+		
+		String mailContent = templateProcessorService.processTemplate( template.getHtml(), dataModel );
 
 		Email email = Email.builder()
 				.text( mailContent )

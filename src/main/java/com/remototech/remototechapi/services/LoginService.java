@@ -2,6 +2,8 @@ package com.remototech.remototechapi.services;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 
 import javax.security.auth.login.LoginException;
 
@@ -76,9 +78,9 @@ public class LoginService implements UserDetailsService {
 		this.loginRepository.delete( login );
 	}
 
-	public void deleteById(Integer id_login) {
-		log.info( "{} Removendo Logins por id " + id_login );
-		this.loginRepository.deleteById( id_login );
+	public void deleteById(UUID uuid) {
+		log.info( "{} Removendo Logins por id " + uuid );
+		this.loginRepository.deleteById( uuid );
 	}
 
 	@Override
@@ -111,7 +113,7 @@ public class LoginService implements UserDetailsService {
 		}
 
 		appUserService.save( appUser );
-		
+
 		try {
 			accountCreationNotificationService.notify( loginSaved );
 		} catch (TemplateException | IOException e) {
@@ -179,6 +181,21 @@ public class LoginService implements UserDetailsService {
 	public void setNewPassword(String recoveryHash, String newPassword) throws GlobalException {
 		String newPasswordEncoded = passwordEncoder.encode( newPassword );
 		recoveryPasswordService.recoveryPassword( recoveryHash, newPasswordEncoded );
+	}
+
+	public void confirm(UUID loginUuid) throws GlobalException {
+		Optional<Login> loginReturn = loginRepository.findById( loginUuid );
+		if (loginReturn.isEmpty())
+			throw new GlobalException( "Conta não encontrada" );
+		else {
+			Login login = loginReturn.get();
+			if(login.isActive())
+				throw new GlobalException( "A conta já se encontra ativa" );
+			else {
+				login.setActive( true );
+				loginRepository.save( login );
+			}
+		}
 	}
 
 }
