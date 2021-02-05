@@ -5,8 +5,6 @@ import org.springframework.stereotype.Repository;
 
 import com.remototech.remototechapi.entities.Login;
 
-import java.util.UUID;
-
 @Repository
 public interface LoginRepository extends JpaRepository<Login, Integer> {
 
@@ -22,5 +20,4 @@ public interface LoginRepository extends JpaRepository<Login, Integer> {
 
 	public boolean existsByLinkedInId(String linkedInId);
 
-	Login findByUuid(UUID uuid);
 }
