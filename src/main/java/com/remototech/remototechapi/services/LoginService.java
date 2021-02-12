@@ -117,7 +117,7 @@ public class LoginService implements UserDetailsService {
 		try {
 			accountCreationNotificationService.notify( loginSaved );
 		} catch (TemplateException | IOException e) {
-			log.error( "Não foi possível notificar a criação de conta por email." );
+			log.error( "Não foi possível notificar a criação de conta por email.", e );
 		}
 	}
 
@@ -189,7 +189,7 @@ public class LoginService implements UserDetailsService {
 			throw new GlobalException( "Conta não encontrada" );
 		else {
 			Login login = loginReturn.get();
-			if(login.isActive())
+			if (login.isActive())
 				throw new GlobalException( "A conta já se encontra ativa" );
 			else {
 				login.setActive( true );
