@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.entities;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -36,5 +37,7 @@ public class Candidature {
 	private Candidate candidate;
 	@Enumerated(EnumType.STRING)
 	private CandidatureStatus status;
+
+	private ArrayList<String> messages;
 
 }
