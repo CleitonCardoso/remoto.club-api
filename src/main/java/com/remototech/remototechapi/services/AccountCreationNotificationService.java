@@ -28,11 +28,10 @@ public class AccountCreationNotificationService {
 
 	@Autowired
 	private EmailService emailService;
-	
+
 	@Value("${frontend-url}")
 	private String frontendUrl;
 
-	@Async
 	public void notify(Login login) throws TemplateException, IOException {
 		Role role = login.getRole();
 
@@ -45,11 +44,11 @@ public class AccountCreationNotificationService {
 		}
 
 		String confirmationUrl = frontendUrl + "/confirm/" + login.getUuid();
-		
+
 		Map<String, Object> dataModel = new LinkedHashMap<>();
 		dataModel.put( "login", login );
 		dataModel.put( "confirmationUrl", confirmationUrl );
-		
+
 		String mailContent = templateProcessorService.processTemplate( template.getHtml(), dataModel );
 
 		Email email = Email.builder()
