@@ -1,4 +1,4 @@
-package com.remototech.remototechapi.entities;
+package com.remototech.remototechapi.entities.chat;
 
 import java.util.UUID;
 
@@ -7,11 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.validation.constraints.NotBlank;
 
-import org.hibernate.annotations.ColumnDefault;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.hibernate.annotations.DynamicUpdate;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,21 +20,21 @@ import lombok.NoArgsConstructor;
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
-public class Tenant {
+@DynamicUpdate
+public class ChatMessage {
 
 	@Id
 	@Column(columnDefinition = "uuid", updatable = false)
 	@GeneratedValue(generator = "system-uuid", strategy = GenerationType.AUTO)
 	private UUID uuid;
 
-	@NotBlank(message = "Nome da empresa obrigatório.")
-	private String companyName;
-	private String phone;
-	private String contactEmail;
-	@ColumnDefault("true")
-	private boolean active;
-	@JsonIgnore
-	@ColumnDefault("false")
-	private boolean partner;
+	@Column(length = 500)
+	private String sender;
+
+	@Column(length = 5000)
+	private String content;
+
+	private UUID loginUuid;
+	private UUID candidatureUuid;
 
 }

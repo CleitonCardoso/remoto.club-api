@@ -90,4 +90,12 @@ public class Job {
 		lastUpdate = LocalDateTime.now();
 	}
 
+	public String getCompany() {
+		if (tenant != null) {
+			return tenant.getCompanyName();
+		} else {
+			return company;
+		}
+	}
+
 }

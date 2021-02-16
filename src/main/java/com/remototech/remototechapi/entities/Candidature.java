@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.entities;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -10,6 +11,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -36,5 +38,13 @@ public class Candidature {
 	private Candidate candidate;
 	@Enumerated(EnumType.STRING)
 	private CandidatureStatus status;
+
+	@Column(updatable = false)
+	private LocalDateTime createdDate;
+
+	@PrePersist
+	public void prePersist() {
+		createdDate = LocalDateTime.now();
+	}
 
 }

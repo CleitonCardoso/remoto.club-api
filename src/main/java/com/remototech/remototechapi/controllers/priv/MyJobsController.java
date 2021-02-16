@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.Candidate;
+import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.exceptions.GlobalException;
+import com.remototech.remototechapi.services.CandidatureService;
 import com.remototech.remototechapi.services.JobsService;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -31,6 +33,9 @@ public class MyJobsController extends LoggedInController {
 
 	@Autowired
 	private JobsService jobsService;
+
+	@Autowired
+	private CandidatureService candidatureService;
 
 	@GetMapping
 	public Page<Job> findAll(
@@ -72,6 +77,12 @@ public class MyJobsController extends LoggedInController {
 	public Set<Candidate> getCandidates(@PathVariable("uuid") UUID jobUuid) {
 		Login loggedUser = getLoggedUser();
 		return jobsService.getCandidatesFrom( jobUuid, loggedUser.getTenant() );
+	}
+
+	@GetMapping("{uuid}/candidates/{candidate_uuid}")
+	public Candidature getCandidature(@PathVariable("uuid") UUID jobUuid, @PathVariable("candidate_uuid") UUID candidateUuid) {
+		Login loggedUser = getLoggedUser();
+		return candidatureService.findByJobUuidTenantAndCandidate( jobUuid, loggedUser.getTenant().getUuid(), candidateUuid );
 	}
 
 }

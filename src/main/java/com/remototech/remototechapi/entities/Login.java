@@ -77,6 +77,7 @@ public class Login implements UserDetails {
 
 	@OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
 	@JoinColumn(name = "tenant_uuid", referencedColumnName = "uuid")
+	@JsonIgnore
 	private Tenant tenant;
 
 	@OneToOne(mappedBy = "login")

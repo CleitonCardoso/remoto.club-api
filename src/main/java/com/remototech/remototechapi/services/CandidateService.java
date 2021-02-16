@@ -1,6 +1,8 @@
 package com.remototech.remototechapi.services;
 
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -30,6 +32,10 @@ public class CandidateService {
 
 	public List<Candidate> findCandidatesWithIncompleteProfile() {
 		return repository.findAllWithIncompleteInfo();
+	}
+
+	public Set<Candidate> findAllByJobUuid(UUID jobUuid) {
+		return repository.findAllByJobUuid( jobUuid );
 	}
 
 }

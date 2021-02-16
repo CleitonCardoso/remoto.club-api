@@ -157,18 +157,34 @@ public class LoginService implements UserDetailsService {
 		validateLinkedinId( linkedInId );
 
 		login.setLinkedInId( linkedInId );
-		login.setRole( Role.COMPANY );
-		Tenant tenant = tenantService.create( login.getTenant(), partnerCode );
-		login.setTenant( tenant );
+
+		if (login.getRole() == Role.COMPANY) {
+			Tenant tenant = tenantService.create( login.getTenant(), partnerCode );
+			login.setTenant( tenant );
+		}
 
 		Login loginSaved = loginRepository.save( login );
 
-		AppUser appUser = AppUser.builder().name( login.getUsername() ).login( loginSaved ).tenant( tenant ).build();
+		if (login.getRole() == Role.CANDIDATE) {
+			Candidate candidate = candidateService.getOrCreateIfNotExists( loginSaved );
+			loginSaved.setCandidate( candidate );
+		}
+
+		AppUser appUser = AppUser.builder()
+				.name( login.getUsername() )
+				.login( loginSaved )
+				.build();
+
+		if (login.getTenant() != null) {
+			appUser.setTenant( login.getTenant() );
+		}
+
 		appUserService.save( appUser );
+
 		try {
 			accountCreationNotificationService.notify( loginSaved );
 		} catch (TemplateException | IOException e) {
-			log.error( "Não foi possível notificar a criação de conta por email." );
+			log.error( "Não foi possível notificar a criação de conta por email.", e );
 		}
 	}
 

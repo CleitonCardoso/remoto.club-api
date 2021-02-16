@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.entities.Tenant;
 import com.remototech.remototechapi.repositories.CandidatureRepository;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -117,5 +118,9 @@ public class CandidatureService {
 		query = query == null ? candidatesSpec : query.and( candidatesSpec );
 
 		return repository.findAll( query, PageRequest.of( pageIndex, resultSize, Sort.by( "job.createdDate" ).descending() ) );
+	}
+
+	public Candidature findByJobUuidTenantAndCandidate(UUID jobUuid, UUID tenantUuid, UUID candidateUuid) {
+		return repository.findByJobUuidTenantAndCandidate(jobUuid, tenantUuid, candidateUuid);
 	}
 }

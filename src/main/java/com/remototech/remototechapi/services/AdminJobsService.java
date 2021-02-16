@@ -127,11 +127,7 @@ public class AdminJobsService {
 	}
 
 	public Set<Candidate> getCandidatesFrom(UUID jobUuid) {
-		Job job = repository.findByUuidOrderByJobStatusDesc( jobUuid );
-		if (job != null) {
-			return job.getCandidates();
-		}
-		return null;
+		return candidateService.findAllByJobUuid(jobUuid);
 	}
 
 	public Page<Job> findAllByFilterAndCandidate(JobsFilter filter, int pageIndex, Integer resultSize, Login loggedUser) {
