@@ -8,6 +8,7 @@ import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,6 +23,7 @@ import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Job;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.entities.Role;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.services.CandidatureService;
 import com.remototech.remototechapi.services.JobsService;
@@ -29,6 +31,7 @@ import com.remototech.remototechapi.vos.JobsFilter;
 
 @RestController
 @RequestMapping("private/my-jobs")
+@PreAuthorize("hasAnyAuthority('ADMIN', 'COMPANY')")
 public class MyJobsController extends LoggedInController {
 
 	@Autowired
@@ -82,6 +85,9 @@ public class MyJobsController extends LoggedInController {
 	@GetMapping("{uuid}/candidates/{candidate_uuid}")
 	public Candidature getCandidature(@PathVariable("uuid") UUID jobUuid, @PathVariable("candidate_uuid") UUID candidateUuid) {
 		Login loggedUser = getLoggedUser();
+		if (Role.ADMIN.equals( loggedUser.getRole() )) {
+			return candidatureService.findByJobUuidAndCandidate( jobUuid, candidateUuid );
+		}
 		return candidatureService.findByJobUuidTenantAndCandidate( jobUuid, loggedUser.getTenant().getUuid(), candidateUuid );
 	}
 

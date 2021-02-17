@@ -18,7 +18,6 @@ import org.springframework.stereotype.Service;
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Login;
-import com.remototech.remototechapi.entities.Tenant;
 import com.remototech.remototechapi.repositories.CandidatureRepository;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -30,9 +29,8 @@ public class CandidatureService {
 	@Autowired
 	private CandidateService candidateService;
 
-	public Candidature findByJobUuidAndCandidate(UUID jobUuid, Login loggedUser) {
-		Candidate candidate = candidateService.getOrCreateIfNotExists( loggedUser );
-		return repository.findByJobUuidAndCandidate( jobUuid, candidate );
+	public Candidature findByJobUuidAndCandidate(UUID jobUuid, UUID candidateUuid) {
+		return repository.findByJobUuidAndCandidateUuid( jobUuid, candidateUuid );
 	}
 
 	public Candidature save(Candidature candidature) {
@@ -121,6 +119,13 @@ public class CandidatureService {
 	}
 
 	public Candidature findByJobUuidTenantAndCandidate(UUID jobUuid, UUID tenantUuid, UUID candidateUuid) {
-		return repository.findByJobUuidTenantAndCandidate(jobUuid, tenantUuid, candidateUuid);
+		return repository.findByJobUuidTenantAndCandidate( jobUuid, tenantUuid, candidateUuid );
+	}
+
+	public boolean isCandidateOrCreator(UUID loginUuid, UUID tenantUuid, UUID candidatureUuid) {
+		if (tenantUuid == null)
+			return repository.isCandidate( loginUuid, candidatureUuid );
+		else
+			return repository.isCreator( tenantUuid, candidatureUuid );
 	}
 }

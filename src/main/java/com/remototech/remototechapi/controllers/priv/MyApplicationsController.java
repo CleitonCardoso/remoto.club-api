@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.controllers.LoggedInController;
+import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.services.CandidateService;
 import com.remototech.remototechapi.services.CandidatureService;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -25,11 +27,15 @@ public class MyApplicationsController extends LoggedInController {
 
 	@Autowired
 	private CandidatureService candidatureService;
+	
+	@Autowired
+	private CandidateService candidateService;
 
 	@GetMapping("{job_uuid}")
 	public Candidature getCandidature(@PathVariable("job_uuid") UUID jobUuid) {
 		Login loggedUser = getLoggedUser();
-		return candidatureService.findByJobUuidAndCandidate( jobUuid, loggedUser );
+		Candidate candidate = candidateService.getOrCreateIfNotExists( loggedUser );
+		return candidatureService.findByJobUuidAndCandidate( jobUuid, candidate.getUuid() );
 	}
 
 	@GetMapping

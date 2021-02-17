@@ -13,6 +13,7 @@ import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.chat.ChatMessage;
 import com.remototech.remototechapi.exceptions.GlobalException;
+import com.remototech.remototechapi.services.ChatMessageService;
 import com.remototech.remototechapi.services.LoginService;
 
 @Controller
@@ -24,6 +25,9 @@ public class ChatController extends LoggedInController {
 	@Autowired
 	private SimpMessagingTemplate simpMessagingTemplate;
 
+	@Autowired
+	private ChatMessageService chatMessageService;
+
 	@MessageMapping("/chat")
 	public void sendMessage(@Payload ChatMessage chatMessage, SimpMessageHeaderAccessor headerAccessor) throws GlobalException {
 		String username = headerAccessor.getSessionAttributes().get( "username" ).toString();
@@ -33,6 +37,8 @@ public class ChatController extends LoggedInController {
 		chatMessage.setCandidatureUuid( UUID.fromString( candidature ) );
 		chatMessage.setSender( login.getUser().getName() );
 		chatMessage.setLoginUuid( login.getUuid() );
+
+		chatMessageService.save( chatMessage, login );
 
 		simpMessagingTemplate.convertAndSend( "/queue/messages/" + candidature, chatMessage );
 	}

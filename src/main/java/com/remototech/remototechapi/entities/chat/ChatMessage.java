@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.entities.chat;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -7,6 +8,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 
 import org.hibernate.annotations.DynamicUpdate;
 
@@ -36,5 +38,13 @@ public class ChatMessage {
 
 	private UUID loginUuid;
 	private UUID candidatureUuid;
+
+	@Column(updatable = false)
+	private LocalDateTime createdDate;
+
+	@PrePersist
+	public void prePersist() {
+		createdDate = LocalDateTime.now();
+	}
 
 }
