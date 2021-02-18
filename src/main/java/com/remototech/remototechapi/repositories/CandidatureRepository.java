@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.repositories;
 
+import java.util.Set;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.Query;
@@ -28,5 +29,7 @@ public interface CandidatureRepository extends JpaRepositoryImplementation<Candi
 			+ " WHERE uuid = :candidatureUuid"
 			+ " AND job.tenant.uuid = :tenantUuid")
 	boolean isCreator(@Param("tenantUuid") UUID tenantUuid, @Param("candidatureUuid") UUID candidatureUuid);
+
+	Set<Candidature> findByJobUuidAndJobTenantUuid(UUID jobUuid, UUID tenantUuid);
 
 }

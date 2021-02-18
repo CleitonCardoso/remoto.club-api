@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.remototech.remototechapi.controllers.LoggedInController;
+import com.remototech.remototechapi.dtos.CandidateDTO;
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Job;
@@ -77,9 +78,9 @@ public class MyJobsController extends LoggedInController {
 	}
 
 	@GetMapping("{uuid}/candidates")
-	public Set<Candidate> getCandidates(@PathVariable("uuid") UUID jobUuid) {
+	public Set<CandidateDTO> getCandidates(@PathVariable("uuid") UUID jobUuid) throws GlobalException {
 		Login loggedUser = getLoggedUser();
-		return jobsService.getCandidatesFrom( jobUuid, loggedUser.getTenant() );
+		return candidatureService.findByJobUuidAndTenantUuid( jobUuid, loggedUser.getTenant().getUuid() );
 	}
 
 	@GetMapping("{uuid}/candidates/{candidate_uuid}")

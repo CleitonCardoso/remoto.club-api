@@ -1,6 +1,8 @@
 package com.remototech.remototechapi.services;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import javax.persistence.criteria.CriteriaBuilder;
@@ -15,9 +17,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import com.remototech.remototechapi.dtos.CandidateDTO;
 import com.remototech.remototechapi.entities.Candidate;
 import com.remototech.remototechapi.entities.Candidature;
 import com.remototech.remototechapi.entities.Login;
+import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.repositories.CandidatureRepository;
 import com.remototech.remototechapi.vos.JobsFilter;
 
@@ -127,5 +131,18 @@ public class CandidatureService {
 			return repository.isCandidate( loginUuid, candidatureUuid );
 		else
 			return repository.isCreator( tenantUuid, candidatureUuid );
+	}
+
+	public Set<CandidateDTO> findByJobUuidAndTenantUuid(UUID jobUuid, UUID tenantUuid) throws GlobalException {
+		Set<Candidature> candidatures = repository.findByJobUuidAndJobTenantUuid( jobUuid, tenantUuid );
+		Set<CandidateDTO> candidates = new LinkedHashSet<>();
+		candidatures.forEach( candidature -> candidates.add( CandidateDTO.builder()
+				.candidatureStatus( candidature.getStatus().getDescription() )
+				.name( candidature.getCandidate().getName() )
+				.dateApplied( candidature.getCreatedDate() )
+				.linkedInUrl( candidature.getCandidate().getLinkedInUrl() )
+				.uuid( candidature.getCandidate().getUuid() )
+				.build() ) );
+		return candidates;
 	}
 }
