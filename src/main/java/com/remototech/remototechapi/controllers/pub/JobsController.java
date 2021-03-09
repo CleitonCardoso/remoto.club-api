@@ -1,10 +1,12 @@
 package com.remototech.remototechapi.controllers.pub;
 
 import java.io.IOException;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,4 +30,11 @@ public class JobsController {
 		return jobsService.findAllByFilter( filter, pageIndex < 1 ? 0 : pageIndex - 1, resultSize );
 	}
 
+	
+	
+	
+	@GetMapping("{uuid}")
+	public Job getJpb(@PathVariable("uuid") UUID uuid) throws IOException {
+		return jobsService.findById(uuid);
+	}
 }

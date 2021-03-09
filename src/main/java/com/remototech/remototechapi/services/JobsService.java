@@ -291,4 +291,8 @@ public class JobsService {
 		}
 	}
 
+	public Job findById(UUID uuid) {
+		return repository.findById( uuid ).get();
+	}
+
 }
