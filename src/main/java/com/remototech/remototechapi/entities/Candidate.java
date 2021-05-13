@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.entities;
 
+import java.time.LocalDateTime;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -15,6 +16,8 @@ import javax.persistence.ManyToMany;
 import javax.persistence.NamedAttributeNode;
 import javax.persistence.NamedEntityGraph;
 import javax.persistence.OneToOne;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
@@ -51,5 +54,20 @@ public class Candidate {
 	@JsonIgnore
 	@Builder.Default
 	private Set<Job> jobs = new LinkedHashSet<Job>();
+
+	@Column(updatable = false)
+	private LocalDateTime createdDate;
+
+	private LocalDateTime lastUpdate;
+
+	@PrePersist
+	public void prePersist() {
+		createdDate = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		lastUpdate = LocalDateTime.now();
+	}
 
 }

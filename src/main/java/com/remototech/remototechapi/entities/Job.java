@@ -79,6 +79,8 @@ public class Job {
 
 	@Enumerated(EnumType.STRING)
 	private JobStatus jobStatus;
+	
+	private String thirdPartyUrl;
 
 	@PrePersist
 	public void prePersist() {

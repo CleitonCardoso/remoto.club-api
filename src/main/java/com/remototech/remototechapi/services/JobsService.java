@@ -13,11 +13,14 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.remototech.remototechapi.entities.Candidate;
@@ -293,6 +296,27 @@ public class JobsService {
 
 	public Job findById(UUID uuid) {
 		return repository.findById( uuid ).get();
+	}
+
+	@Async
+	@Transactional(propagation = Propagation.REQUIRES_NEW)
+	public void createIfNotExists(Job job, Tenant tenant) {
+		Specification<Job> matcherSpec = new Specification<Job>() {
+			private static final long serialVersionUID = 9164462953718514652L;
+
+			@Override
+			public Predicate toPredicate(Root<Job> root, CriteriaQuery<?> query, CriteriaBuilder criteriaBuilder) {
+				Predicate predicate = criteriaBuilder.and( criteriaBuilder.like( criteriaBuilder.upper( root.get( "title" ) ), "%" + job.getTitle().toUpperCase() + "%" ),
+						criteriaBuilder.like( criteriaBuilder.upper( root.get( "description" ) ), "%" + job.getDescription().toUpperCase() + "%" ),
+						criteriaBuilder.like( criteriaBuilder.upper( root.get( "company" ) ), "%" + job.getCompany().toUpperCase() + "%" ) );
+				return predicate;
+			}
+
+		};
+		List<Job> allFound = repository.findAll( matcherSpec );
+		if (allFound.isEmpty()) {
+			create( job, tenant );
+		}
 	}
 
 }

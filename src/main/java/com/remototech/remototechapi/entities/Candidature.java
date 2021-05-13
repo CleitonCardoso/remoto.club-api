@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Table;
 
 import lombok.AllArgsConstructor;
@@ -42,9 +43,16 @@ public class Candidature {
 	@Column(updatable = false)
 	private LocalDateTime createdDate;
 
+	private LocalDateTime lastUpdate;
+
 	@PrePersist
 	public void prePersist() {
 		createdDate = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		lastUpdate = LocalDateTime.now();
 	}
 
 }

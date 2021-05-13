@@ -1,5 +1,6 @@
 package com.remototech.remototechapi.entities;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import javax.persistence.Column;
@@ -9,6 +10,8 @@ import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
+import javax.persistence.PreUpdate;
 import javax.persistence.Version;
 
 import lombok.AllArgsConstructor;
@@ -45,5 +48,20 @@ public class MailTemplate {
 	@Enumerated(EnumType.STRING)
 	@Column(updatable = true)
 	private JobTemplateType jobTemplateType;
+
+	@Column(updatable = false)
+	private LocalDateTime createdDate;
+
+	private LocalDateTime lastUpdate;
+
+	@PrePersist
+	public void prePersist() {
+		createdDate = LocalDateTime.now();
+	}
+
+	@PreUpdate
+	public void preUpdate() {
+		lastUpdate = LocalDateTime.now();
+	}
 
 }
