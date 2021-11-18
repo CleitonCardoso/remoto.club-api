@@ -1,5 +1,7 @@
 package com.remototech.remototechapi.services;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +15,6 @@ import javax.persistence.criteria.Predicate;
 import javax.persistence.criteria.Root;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Example;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -317,6 +318,11 @@ public class JobsService {
 		if (allFound.isEmpty()) {
 			create( job, tenant );
 		}
+	}
+
+	public void closeOldJobs() {
+		LocalDateTime fourMonthsAgo = LocalDate.now().minusDays( 120 ).atStartOfDay();
+		repository.closeOlderThanFourMonths( fourMonthsAgo );
 	}
 
 }
