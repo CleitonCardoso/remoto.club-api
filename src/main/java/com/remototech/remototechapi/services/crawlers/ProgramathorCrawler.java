@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.remototech.remototechapi.entities.CompensationType;
 import com.remototech.remototechapi.entities.Job;
 
+import io.micrometer.core.instrument.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -109,9 +110,10 @@ public class ProgramathorCrawler {
 		String numberSalary = salaryText.replace( "Salário: Até R$", "" )
 				.replace( "Salário: Acima de R$", "" )
 				.replace( ".", "" );
-		BigDecimal salary = BigDecimal.valueOf( Long.valueOf( numberSalary ) );
-		job.setSalary( salary );
-
+		if (!StringUtils.isEmpty( numberSalary )) {
+			BigDecimal salary = BigDecimal.valueOf( Long.valueOf( numberSalary ) );
+			job.setSalary( salary );
+		}
 	}
 
 	private void clearScriptTags(Document document) {
