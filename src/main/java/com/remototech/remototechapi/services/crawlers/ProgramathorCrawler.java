@@ -97,10 +97,13 @@ public class ProgramathorCrawler {
 				if (!targetElements.isEmpty()) {
 					return targetElements.get( 0 ).text();
 				}
+			}
+			if (StringUtils.isEmpty( elementP.text() )) {
+				Element parent = elementP.parent();
+				return parent.text();
 			} else {
 				return elementP.text();
 			}
-
 		}
 		return null;
 	}
@@ -153,4 +156,8 @@ public class ProgramathorCrawler {
 		return !StringUtil.isBlank( moneySpam.text() );
 	}
 
+	public static void main(String[] args) throws IOException {
+		ProgramathorCrawler programathorCrawler = new ProgramathorCrawler();
+		programathorCrawler.extractJobs( 4 );
+	}
 }
