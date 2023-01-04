@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.services.JobsService;
 

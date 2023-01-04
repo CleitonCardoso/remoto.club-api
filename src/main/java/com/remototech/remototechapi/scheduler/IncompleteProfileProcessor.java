@@ -1,4 +1,4 @@
-package com.remototech.remototechapi.job;
+package com.remototech.remototechapi.scheduler;
 
 import java.io.IOException;
 

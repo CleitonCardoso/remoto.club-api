@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.AppUser;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.exceptions.GlobalException;

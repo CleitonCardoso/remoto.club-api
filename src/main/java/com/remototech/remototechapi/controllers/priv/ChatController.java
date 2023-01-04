@@ -9,7 +9,6 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.Login;
 import com.remototech.remototechapi.entities.chat.ChatMessage;
 import com.remototech.remototechapi.exceptions.GlobalException;

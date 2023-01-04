@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.remototech.remototechapi.controllers.LoggedInController;
 import com.remototech.remototechapi.entities.chat.ChatMessage;
 import com.remototech.remototechapi.exceptions.GlobalException;
 import com.remototech.remototechapi.services.ChatMessageService;
